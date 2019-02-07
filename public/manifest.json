@@ -4,24 +4,25 @@
   "manifest_version": 2,
   "browser_action": {},
   "content_security_policy": "script-src 'self' 'sha256-GgRxrVOKNdB4LrRsVPDSbzvfdV4UqglmviH9GoBJ5jk='; object-src 'self'",
-  "content_scripts": [
-    {
-      "matches": ["<all_urls>"],
-      "css": [],
-      "js": [
-        "/static/js/0.chunk.js",
-        "/static/js/3.chunk.js",
-        "/static/js/content.js"
-      ]
-    }
-  ],
+  "content_scripts": [ {
+    "matches": [ "<all_urls>" ],
+    "css": [
+      "/static/css/content.css",
+      "/static/css/app.css",
+      "/static/css/0.chunk.css"
+    ],
+    "js": [
+      "/static/js/0.chunk.js",
+      "/static/js/content.js",
+      "/static/js/app.js"
+    ]
+  } ],
   "background": {
-    "scripts": ["app/background.js"]
+    "scripts": [ "app/background.js" ]
   },
   "web_accessible_resources": [
     "/static/css/content.css",
     "/static/css/app.css",
-    "/static/css/3.chunk.css",
     "/static/css/0.chunk.css"
   ]
 }

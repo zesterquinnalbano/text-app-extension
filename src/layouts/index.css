@@ -1,0 +1,21 @@
+.lnx-main-header {
+  text-align: right;
+  vertical-align: middle
+}
+
+.lnx-main-header .ant-layout-header {
+  padding: 0px 25px 0px 25px;
+}
+
+.lnx-add-contact-button {
+  margin-right: 20px
+}
+
+.lnx-close-icon {
+  font-size: 1rem;
+  color: white;
+}
+
+.lnx-sub-header {
+  text-align: center;
+}
