@@ -2,18 +2,9 @@
   /* margin-top: 5px */
 }
 
-.lnx-inbox-search {
-  padding: 15px;
-  box-shadow: 1px 5px 8px #d4d4d4;
-}
-
-.lnx-inbox-search-icon-container {
-  text-align: center
-}
-
-.lnx-inbox-search-icon {
-  vertical-align: middle !important;
-  font-size: 1.5rem !important
+.lnx-inbox-message-container {
+  overflow: auto;
+  height: calc(100vh - 175px) !important
 }
 
 .lnx-inbox-message-box {
@@ -40,8 +31,4 @@
 
 .lnx-inbox-message-box .ant-badge-not-a-wrapper {
   margin-right: 10px;
-}
-
-.lnx-inbox-message-inifinite-scroll {
-  overflow: auto;
 }

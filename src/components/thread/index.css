@@ -1,0 +1,106 @@
+.lnx-thread-body {
+  overflow: auto;
+  height: calc(100vh - 295px) !important
+}
+
+.lnx-thread-textarea {
+  margin-top: 15px;
+  padding-left: 15px;
+  bottom: 0;
+  position: fixed;
+}
+
+.lnx-thread-header {
+  padding: 15px;
+  box-shadow: 1px 5px 8px #d4d4d4;
+}
+
+.lnx-thread-header-contact-name {
+  font-size: larger;
+  font-weight: 700;
+  margin-bottom: 0px;
+}
+
+.lnx-thread-header-contact-number {
+  font-style: italic;
+  font-weight: lighter;
+  margin-bottom: 0px;
+}
+
+.lnx-thread-header-icon-container,
+.lnx-thread-textarea-icon-container {
+  text-align: center
+}
+
+.lnx-thread-header-add-icon {
+  margin-top: 10px !important;
+  font-size: 1.5rem !important
+}
+
+.lnx-thread-textarea-send-icon {
+  margin-top: 25px;
+  font-size: 2rem !important;
+}
+
+.lnx-thread-body {
+  background-color: #f1f1f1
+}
+
+.lnx-thread-message-card {
+  word-wrap: break-word
+}
+
+.lnx-thread:not(:last-child) {
+  border-bottom: none !important;
+  padding-bottom: 0px !important;
+}
+
+.lnx-thread .ant-list-item-content.ant-list-item-content-single {
+  word-break: break-word;
+}
+
+.lnx-thread .lnx-thread-message-card .ant-card-body {
+  padding: 10px 10px 5px 10px;
+  min-width: 150px
+}
+
+.lnx-thread-message-time {
+  margin-bottom: 0px;
+  text-align: right;
+  font-size: small;
+  font-style: italic;
+}
+
+.lnx-thread-message-content {
+  margin-bottom: 5px;
+}
+
+.lnx-thread-outbound .ant-card-body {
+  background-color: #40a9ff;
+  color: white
+}
+
+.lnx-thread-inbound .ant-card-body {
+  background-color: white;
+  color: #4c4c4c
+}
+
+.lnx-thread.lnx-thread-inbound {
+  padding-right: 100px !important;
+}
+
+.lnx-thread.lnx-thread-outbound {
+  padding-left: 100px !important
+}
+
+.lnx-thread-outbound .ant-list-item-content.ant-list-item-content-single {
+  justify-content: flex-end;
+}
+
+.lnx-thread-inbound .ant-list-item-content.ant-list-item-content-single {
+  justify-content: flex-start;
+}
+
+.lnx-thread-body .ant-list-bordered {
+  border: none
+}

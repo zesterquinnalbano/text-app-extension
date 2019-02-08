@@ -1,0 +1,39 @@
+.lnx-search-bar {
+  padding: 15px;
+  box-shadow: 1px 5px 8px #d4d4d4;
+}
+
+.lnx-search-bar-icon-container {
+  text-align: center
+}
+
+.lnx-search-bar-icon {
+  vertical-align: middle !important;
+  font-size: 1.5rem !important
+}
+
+.lnx-list-container-content:hover {
+  background: #40a9ff !important;
+  color: white !important;
+  cursor: pointer;
+}
+
+.lnx-list-container-content .ant-list-item-meta-title {
+  font-weight: 600;
+  margin-bottom: 0px;
+  color: unset
+}
+
+.lnx-list-container-content .ant-list-item-meta-description {
+  font-style: italic;
+  color: unset;
+  font-size: small
+}
+
+.lnx-list-container-content {
+  padding: 8px 25px 8px 15px !important
+}
+
+/* .lnx-inbox-message-box .ant-badge-not-a-wrapper {
+  margin-right: 10px;
+} */

@@ -1,10 +1,10 @@
 import React from 'react';
 import { Icon, Row, Layout, Button } from 'antd';
-import style from './index.css';
+import './index.css';
 
-const { Header } = Layout;
+export default function MainHeader() {
+	const { Header } = Layout;
 
-function MainHeader() {
 	return (
 		<Row className={'lnx-main-header'}>
 			<Header>
@@ -23,5 +23,3 @@ function MainHeader() {
 		</Row>
 	);
 }
-
-export default MainHeader;

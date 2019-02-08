@@ -2,26 +2,29 @@ import React, { useState, useEffect } from 'react';
 import './index.css';
 import MainHeader from './main-header';
 import SubHeader from './sub-header';
-import Router, { goTo } from 'route-lite';
+import Router from 'route-lite';
 import AppContext from '../context/app-context';
+import { useId, useComponent } from '../states';
 
 export default function MainLayout() {
-	let [renderedComponent, changeRenderedComponent] = useState(null);
-
-	/**
-	 * assign the component passed by the SubHeader
-	 * then renders the component
-	 */
-	function getComponent(component) {
-		changeRenderedComponent(goTo(component));
-	}
+	let state = {
+		/**
+		 * assign the component passed by the SubHeader
+		 * then renders the component
+		 */
+		component: useComponent(),
+		/**
+		 * get the id from the selected message
+		 */
+		selectedMessage: useId()
+	};
 
 	return (
 		<div className="main-layout">
-			<AppContext.Provider value={{ asd: 'asd' }}>
+			<AppContext.Provider value={state}>
 				<MainHeader />
-				<SubHeader component={getComponent} />
-				<Router>{renderedComponent}</Router>
+				<SubHeader />
+				<Router>{state.component.currentComponent}</Router>
 			</AppContext.Provider>
 		</div>
 	);
