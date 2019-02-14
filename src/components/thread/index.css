@@ -19,6 +19,7 @@
   font-size: larger;
   font-weight: 700;
   margin-bottom: 0px;
+  cursor: pointer;
 }
 
 .lnx-thread-header-contact-number {

@@ -1,34 +1,8 @@
-.lnx-inbox-container {
-  /* margin-top: 5px */
-}
-
 .lnx-inbox-message-container {
   overflow: auto;
   height: calc(100vh - 175px) !important
 }
 
-.lnx-inbox-message-box {
-  padding: 8px 25px 8px 15px !important
-}
-
-.lnx-inbox-message-box:hover {
-  background: #40a9ff !important;
-  color: white !important;
-  cursor: pointer;
-}
-
-.lnx-inbox-message-box .ant-list-item-meta-title {
-  font-weight: 600;
-  margin-bottom: 0px;
-  color: unset
-}
-
-.lnx-inbox-message-box .ant-list-item-meta-description {
-  font-style: italic;
-  color: unset;
-  font-size: small
-}
-
-.lnx-inbox-message-box .ant-badge-not-a-wrapper {
+.lnx-inbox-message-container .ant-badge-not-a-wrapper {
   margin-right: 10px;
 }

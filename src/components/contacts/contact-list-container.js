@@ -1,25 +1,8 @@
-import React, { useContext, Fragment } from 'react';
-import { List, Row, Icon, Col, Tag } from 'antd';
+import React, { useContext, useState, useEffect } from 'react';
+import { Row, Col } from 'antd';
 import AppContext from '../../context/app-context';
 import ListContainer from '../common/list-container';
-
-const data = [
-	{
-		id: 1,
-		title: 'Contact 1',
-		description: '09152597181'
-	},
-	{
-		id: 2,
-		title: 'Contact 2',
-		description: '09152597181'
-	},
-	{
-		id: 3,
-		title: 'Contact 3',
-		description: '09152597181'
-	}
-];
+import { listContact } from '../../resources/contact';
 
 export default function ContactListContainer() {
 	/**
@@ -27,8 +10,36 @@ export default function ContactListContainer() {
 	 */
 	const context = useContext(AppContext);
 
-	function getId(item) {
-		console.log(item);
+	/**
+	 * Contact list pagination object
+	 */
+	const [contactList, changeContactList] = useState([]);
+
+	const [firstLoad, changeFirstLoad] = useState(true);
+
+	useEffect(() => {
+		if (firstLoad) {
+			getList();
+			changeFirstLoad(false);
+		}
+	}, [firstLoad, ...contactList]);
+
+	function getList() {
+		listContact().then(({ data: { data } }) => {
+			let list = data.data.map(({ fullname, contact_number, id }) => {
+				return {
+					id,
+					title: fullname,
+					description: contact_number
+				};
+			});
+
+			changeContactList(list);
+		});
+	}
+
+	function selectedRow(contact) {
+		context.component.renderComponent('NewContact', contact);
 	}
 
 	return (
@@ -37,16 +48,21 @@ export default function ContactListContainer() {
 				<ListContainer
 					pageStart={0}
 					loadMore={() => {}}
-					selectedRow={getId}
-					data={data}
+					selectedRow={selectedRow}
+					data={contactList}
 					rowContent={item => {
-						return (
-							<Fragment>
-								<Tag color="#87d068">
-									<Icon type="message" />
-								</Tag>
-							</Fragment>
-						);
+						// return (
+						// 	<Fragment>
+						// 		<Icon
+						// 			onClick={() => {
+						// 				console.log('asd');
+						// 			}}
+						// 			type="right-circle"
+						// 			theme="filled"
+						// 			className={'send-icon'}
+						// 		/>
+						// 	</Fragment>
+						// );
 					}}
 				/>
 			</Col>

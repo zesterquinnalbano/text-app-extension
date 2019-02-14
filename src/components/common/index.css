@@ -3,13 +3,8 @@
   box-shadow: 1px 5px 8px #d4d4d4;
 }
 
-.lnx-search-bar-icon-container {
+.lnx-search-bar-button-container {
   text-align: center
-}
-
-.lnx-search-bar-icon {
-  vertical-align: middle !important;
-  font-size: 1.5rem !important
 }
 
 .lnx-list-container-content:hover {

@@ -1,0 +1,62 @@
+.lnx-add-contact-content .body {
+  padding: 2rem 2.5rem 0rem 2.5rem;
+}
+
+.lnx-add-contact-content .body .ant-input {
+  margin-top: 1rem
+}
+
+.lnx-add-contact-content .body .ant-input-number {
+  margin-top: 1rem;
+  width: 100%
+}
+
+.lnx-add-contact-content {
+  overflow: auto;
+  height: calc(100vh - 282px) !important
+}
+
+.lnx-add-contact-header {
+  padding: 15px;
+  box-shadow: 1px 5px 8px #d4d4d4;
+}
+
+.lnx-add-contact-header .button-container .save {
+  background-color: #3bb54f;
+  color: white;
+}
+
+.lnx-add-contact-header .title {
+  font-size: large;
+  font-weight: 500;
+  margin: 0px;
+}
+
+.lnx-add-contact-content .upload-container .ant-upload.ant-upload-select {
+  display: block
+}
+
+.lnx-add-contact-textarea .icon-container .send-icon {
+  margin-top: 25px;
+  font-size: 2rem !important;
+}
+
+.lnx-add-contact-textarea .icon-container {
+  text-align: center
+}
+
+.lnx-add-contact-textarea {
+  padding-top: 1rem;
+  padding-left: 15px;
+  bottom: 0;
+  position: fixed;
+  border-top: 1px solid #dadada
+}
+
+.lnx-add-contact-content .action-button {
+  margin-top: 1rem;
+}
+
+.lnx-add-contact-content .action-button .update {
+  float: right
+}

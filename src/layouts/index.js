@@ -1,12 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import Router from 'route-lite';
+import axios from 'axios';
 import './index.css';
+import AppContext from '../context/app-context';
+import { useComponent } from '../states';
 import MainHeader from './main-header';
 import SubHeader from './sub-header';
-import Router from 'route-lite';
-import AppContext from '../context/app-context';
-import { useId, useComponent } from '../states';
 
-export default function MainLayout() {
+export default function MainLayout({ iframeDocument, iframeWindow }) {
 	let state = {
 		/**
 		 * assign the component passed by the SubHeader
@@ -14,10 +15,17 @@ export default function MainLayout() {
 		 */
 		component: useComponent(),
 		/**
-		 * get the id from the selected message
+		 * get the iframe document body
 		 */
-		selectedMessage: useId()
+		iframeDocument
 	};
+
+	axios.defaults.baseURL = 'http://localhost:8000';
+	axios.defaults.headers.common['Authorization'] = localStorage.getItem(
+		'text_app_token'
+	);
+	axios.defaults.headers.post['Content-Type'] =
+		'application/x-www-form-urlencoded';
 
 	return (
 		<div className="main-layout">

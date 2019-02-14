@@ -17,11 +17,16 @@ function Content() {
 				{/**
 				 * Callback is invoked with iframe's window and document instances
 				 */
-				({ document, window }) => {
+				({ document: iframeDocument, window: iframeWindow }) => {
 					/**
 					 * renders that content
 					 */
-					return <Layout />;
+					return (
+						<Layout
+							iframeDocument={iframeDocument}
+							iframeWindow={iframeWindow}
+						/>
+					);
 				}}
 			</FrameContextConsumer>
 		</Frame>

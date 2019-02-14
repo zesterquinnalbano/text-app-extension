@@ -1,16 +1,34 @@
-import React, { useContext } from 'react';
-import { Row, List, Input, Tag, Icon, Col, Card } from 'antd';
+import React, { useContext, useEffect, useState } from 'react';
+import { Row, List, Input, Icon, Col, Card } from 'antd';
 import InfiniteScroll from 'react-infinite-scroller';
 import AppContext from '../../context/app-context';
 import './index.css';
 
-export default function Thread() {
+export default function Thread(props) {
 	const { TextArea } = Input;
+	const { iframeDocument } = useContext(AppContext);
 
-	/**
-	 * get the thread id
-	 */
-	const { selectedMessage } = useContext(AppContext);
+	let [firstLoad, changeFirstLoad] = useState(true);
+
+	useEffect(() => {
+		if (firstLoad) {
+			console.log(props);
+			viewNewMessage();
+			changeFirstLoad(false);
+		}
+	});
+
+	function viewNewMessage() {
+		/**
+		 * get the container of the thread
+		 */
+		let thread = iframeDocument.getElementsByClassName('lnx-thread-body')[0];
+
+		/**
+		 * view the lastest message of the thread
+		 */
+		thread.scrollTop = thread.scrollHeight;
+	}
 
 	const data = [
 		{
@@ -32,7 +50,12 @@ export default function Thread() {
 			<Row className={'lnx-thread-header'}>
 				<Col span={20}>
 					<div className="lnx-thread-header-recipient-info">
-						<p className={'lnx-thread-header-contact-name'}>Zester Quinn</p>
+						<p
+							className={'lnx-thread-header-contact-name'}
+							onClick={viewNewMessage}
+						>
+							Zester Quinn
+						</p>
 						<p className={'lnx-thread-header-contact-number'}>123123123</p>
 					</div>
 				</Col>
@@ -64,7 +87,7 @@ export default function Thread() {
 							renderItem={item => (
 								<List.Item
 									className={`lnx-thread ${
-										item.id % 2 == 0
+										item.id % 2 === 0
 											? 'lnx-thread-inbound'
 											: 'lnx-thread-outbound'
 									}`}
@@ -75,7 +98,6 @@ export default function Thread() {
 										</p>
 										<p className={'lnx-thread-message-time'}>9:50pm</p>
 									</Card>
-									<br />
 								</List.Item>
 							)}
 						/>

@@ -1,8 +1,6 @@
 import React, { useContext, Fragment } from 'react';
-import { List, Row, Icon, Col, Tag } from 'antd';
-import InfiniteScroll from 'react-infinite-scroller';
+import { Row, Icon, Col, Tag } from 'antd';
 import AppContext from '../../context/app-context';
-import Thread from '../thread';
 import ListContainer from '../common/list-container';
 
 const data = [
@@ -127,9 +125,8 @@ export default function MessageContainer() {
 	 * then show the thred message
 	 *  @params id
 	 */
-	function getThread(item, e) {
-		context.selectedMessage.updateId(item.id);
-		context.component.renderComponent(Thread);
+	function getThread(item) {
+		context.component.renderComponent('Thread', item);
 	}
 
 	return (
@@ -148,7 +145,7 @@ export default function MessageContainer() {
 								<Tag color="#f50">
 									<Icon type="warning" />
 								</Tag>
-								<Tag color="#87d068">
+								<Tag color="#3bb54f">
 									<Icon type="message" />
 								</Tag>
 								{item.time}

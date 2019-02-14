@@ -1,23 +1,19 @@
 import React from 'react';
-import { Input, Row, Icon, Col } from 'antd';
+import { Input, Row, Col, Button } from 'antd';
 import './index.css';
 
 export default function SearchBar(props) {
 	return (
 		<Row className={'lnx-search-bar'}>
-			<Col span={props.icon ? 20 : 24}>
+			<Col span={props.buttonText ? 13 : 24}>
 				<Input placeholder={props.placeholder} />
 			</Col>
-			<Col span={4} className={'lnx-search-bar-icon-container'}>
-				{/* check if icon is initialize */}
-				{props.icon ? (
-					<Icon
-						onClick={() => {
-							console.log('asd');
-						}}
-						type={props.icon}
-						className={'lnx-search-bar-icon'}
-					/>
+			<Col span={11} className={'lnx-search-bar-button-container'}>
+				{/* check if buttonText is initialize */}
+				{props.buttonText ? (
+					<Button onClick={props.buttonClicked} type="primary">
+						{props.buttonText}
+					</Button>
 				) : (
 					''
 				)}
