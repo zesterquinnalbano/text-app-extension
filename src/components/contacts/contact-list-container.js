@@ -24,18 +24,23 @@ export default function ContactListContainer() {
 		}
 	}, [firstLoad, ...contactList]);
 
-	function getList() {
-		listContact().then(({ data: { data } }) => {
+	async function getList() {
+		try {
+			const {
+				data: { data }
+			} = await listContact();
+
 			let list = data.data.map(({ fullname, contact_number, id }) => {
 				return {
 					id,
+					contact_id: id,
 					title: fullname,
 					description: contact_number
 				};
 			});
 
 			changeContactList(list);
-		});
+		} catch (error) {}
 	}
 
 	function selectedRow(contact) {

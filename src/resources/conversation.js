@@ -22,10 +22,21 @@ function sendConversation(data) {
 	});
 }
 
+function sendNewConversation(data) {
+	return new Promise((resolve, reject) => {
+		try {
+			const response = axios.post(`conversations/send`, data);
+			resolve(response);
+		} catch (error) {
+			reject(error);
+		}
+	});
+}
+
 function showConversation(id) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.get(`conversations/${id}/show`);
+			const response = axios.get(`conversations/${id}`);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -48,5 +59,6 @@ export {
 	sendConversation,
 	destroyConversation,
 	showConversation,
-	listConversation
+	listConversation,
+	sendNewConversation
 };

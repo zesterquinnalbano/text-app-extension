@@ -10,7 +10,9 @@ function updateCurrentComponent(component, props) {
 }
 
 function getCurrentComponent() {
-	return JSON.parse(localStorage.getItem('current-component'));
+	return localStorage.getItem('current-component')
+		? JSON.parse(localStorage.getItem('current-component'))
+		: { component: null, props: null };
 }
 
 export {

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.1.6",
+    "@babel/polyfill": "^7.2.5",
     "@svgr/webpack": "2.4.1",
     "antd": "^3.13.1",
     "axios": "^0.18.0",
@@ -33,7 +34,9 @@
     "jest": "23.6.0",
     "jest-pnp-resolver": "1.0.1",
     "jest-resolve": "23.6.0",
+    "lodash": "^4.17.11",
     "mini-css-extract-plugin": "0.4.3",
+    "moment": "^2.24.0",
     "optimize-css-assets-webpack-plugin": "5.0.1",
     "pnp-webpack-plugin": "1.1.0",
     "postcss-flexbugs-fixes": "4.1.0",
@@ -118,7 +121,6 @@
       "react-app"
     ],
     "plugins": [
-      "@babel/plugin-transform-async-to-generator",
       [
         "import",
         {
@@ -130,7 +132,6 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-transform-async-to-generator": "^7.2.0",
     "babel-plugin-import": "^1.11.0",
     "css-loader": "^1.0.0"
   }

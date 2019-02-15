@@ -142,7 +142,7 @@ module.exports = function(webpackEnv) {
 		// ].filter(Boolean),
 		entry: {
 			app: [paths.appIndexJs],
-			content: ['./src/index.js']
+			content: ['@babel/polyfill', './src/index.js']
 		},
 		output: {
 			// The build folder.

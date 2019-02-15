@@ -16,9 +16,6 @@ export default function NewContact(props) {
 	 * get global context
 	 */
 	const context = useContext(AppContext);
-
-	const [firstLoad, changeFirstLoad] = useState(true);
-
 	const { TextArea } = Input;
 
 	const contact = {
@@ -37,8 +34,8 @@ export default function NewContact(props) {
 		props.id ? edit() : resetForm();
 	}, [props.id]);
 
-	function redirect() {
-		context.component.renderComponent('Contacts');
+	function redirect(props = null) {
+		context.component.renderComponent('Contacts', props);
 	}
 
 	function resetForm() {
@@ -47,24 +44,41 @@ export default function NewContact(props) {
 		});
 	}
 
-	function edit() {
-		editContact(props.id).then(({ data: { data } }) => {
+	async function store() {
+		try {
+			await storeContact(data);
+			redirect();
+		} catch (error) {}
+	}
+
+	async function edit() {
+		try {
+			const {
+				data: { data }
+			} = await editContact(props.id);
+
 			Object.keys(contact).map(key => {
 				contact[key].handleChange(data[key]);
 			});
-		});
+		} catch (error) {}
 	}
 
-	function update() {
-		updateContact(props.id, data).then(redirect);
+	async function update() {
+		try {
+			await updateContact(props.id, data);
+			redirect();
+		} catch (error) {}
 	}
 
-	function destroy() {
-		destroyContact(props.id).then(redirect);
+	async function destroy() {
+		try {
+			await destroyContact(props.id);
+			redirect();
+		} catch (error) {}
 	}
 
-	function store() {
-		storeContact(data).then(redirect);
+	function newMessage() {
+		context.component.renderComponent('Thread', props);
 	}
 
 	return (
@@ -87,7 +101,7 @@ export default function NewContact(props) {
 					</Col>
 					<Col span={props.id ? 8 : 6} className={'button-container'}>
 						{props.id ? (
-							<Button type="primary">
+							<Button onClick={newMessage} type="primary">
 								<Icon type="message" theme="filled" />
 								Send message
 							</Button>

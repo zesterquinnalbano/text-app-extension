@@ -1,9 +1,13 @@
 import axios from 'axios';
 
-function listContact() {
+function listContact(query = null) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.get(`contacts`);
+			const response = axios.get(`contacts`, {
+				params: {
+					q: query
+				}
+			});
 			resolve(response);
 		} catch (error) {
 			reject(error);

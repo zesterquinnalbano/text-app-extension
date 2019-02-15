@@ -49,15 +49,15 @@ function useComponent() {
 	const { component, props } = getCurrentComponent();
 
 	useEffect(() => {
-		if (component) {
+		if (!component) {
+			changeCurrentComponent(goTo(Login));
+		} else {
 			/**
 			 * set the view to the latest component from the localStorage
 			 */
 			checkComponent(component, props);
-		} else {
-			changeCurrentComponent(goTo(Login));
 		}
-	}, [component]);
+	});
 
 	/**
 	 * check the lastest component from localStorage or passed by sub header

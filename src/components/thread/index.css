@@ -38,9 +38,8 @@
   font-size: 1.5rem !important
 }
 
-.lnx-thread-textarea-send-icon {
-  margin-top: 25px;
-  font-size: 2rem !important;
+.lnx-thread-textarea-send-button-container {
+  margin: 22px 15px 15px 15px;
 }
 
 .lnx-thread-body {
@@ -67,8 +66,15 @@
 
 .lnx-thread-message-time {
   margin-bottom: 0px;
-  text-align: right;
-  font-size: small;
+  float: right;
+  font-size: smaller;
+  font-style: italic;
+}
+
+.lnx-thread-message-sender {
+  margin-bottom: 0px;
+  float: left;
+  font-size: smaller;
   font-style: italic;
 }
 
@@ -104,4 +110,27 @@
 
 .lnx-thread-body .ant-list-bordered {
   border: none
+}
+
+.lnx-twilio-number-container div.ant-dropdown {
+  left: unset !important;
+  top: unset !important;
+  bottom: 87px;
+  z-index: 2147483647;
+  right: 25px;
+}
+
+.lnx-twilio-number-container {
+  left: unset;
+  right: 0px;
+  bottom: 0px;
+  top: unset;
+}
+
+.lnx-recipient-container div.ant-select-dropdown.ant-select-dropdown--multiple {
+  left: unset !important;
+  top: 162.016px !important;
+  right: 14px;
+  width: 345px !important;
+  z-index: 13123123123123;
 }
