@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Menu, Icon, Row } from 'antd';
 import './index.css';
 import AppContext from '../context/app-context';
-import { getCurrentComponent } from '../services';
+import { getCurrentComponent, IsAuthenticated } from '../services';
 
 export default function SubHeader(props) {
 	/**

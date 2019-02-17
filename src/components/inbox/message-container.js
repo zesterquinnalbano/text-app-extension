@@ -3,6 +3,7 @@ import { Row, Icon, Col, Tag } from 'antd';
 import AppContext from '../../context/app-context';
 import ListContainer from '../common/list-container';
 import { listConversation } from '../../resources/conversation';
+import moment from 'moment';
 
 // const data = [
 // 	{
@@ -50,8 +51,8 @@ export default function MessageContainer() {
 		} catch (error) {}
 	}
 
-	function getThread(conversation) {
-		context.component.renderComponent('Thread', conversation);
+	function getThread({ contact_id }) {
+		context.component.renderComponent('Thread', { contact_id });
 	}
 
 	return (
@@ -73,7 +74,7 @@ export default function MessageContainer() {
 								<Tag color="#3bb54f">
 									<Icon type="message" />
 								</Tag> */}
-								{item.created_at}
+								{moment(item.created_at).format('hh:mm a')}
 							</Fragment>
 						);
 					}}

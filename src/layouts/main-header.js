@@ -2,6 +2,8 @@ import React, { useContext } from 'react';
 import { Icon, Row, Layout, Button } from 'antd';
 import './index.css';
 import AppContext from '../context/app-context';
+import { IsAuthenticated } from '../services';
+import { debounce } from 'lodash';
 
 export default function MainHeader() {
 	const { Header } = Layout;

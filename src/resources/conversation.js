@@ -25,7 +25,7 @@ function sendConversation(data) {
 function sendNewConversation(data) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`conversations/send`, data);
+			const response = axios.post(`conversations/send-new`, data);
 			resolve(response);
 		} catch (error) {
 			reject(error);

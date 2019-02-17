@@ -51,8 +51,10 @@ export default function ContactListContainer() {
 		<Row className={'lnx-contacts-container'}>
 			<Col>
 				<ListContainer
-					pageStart={0}
-					loadMore={() => {}}
+					pageStart={1}
+					loadMore={value => {
+						console.log(value);
+					}}
 					selectedRow={selectedRow}
 					data={contactList}
 					rowContent={item => {

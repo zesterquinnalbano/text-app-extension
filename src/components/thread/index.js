@@ -27,37 +27,64 @@ import {
 import { listTwilioNumbers } from '../../resources/twilio-numbers';
 import { listContact } from '../../resources/contact';
 import { debounce } from 'lodash';
-import { useInput } from '../../states';
+import { useInput, useValue } from '../../states';
 
 export default function Thread(props) {
 	const { iframeDocument } = useContext(AppContext);
+
+	/**
+	 * Information variables
+	 */
 	const [threadList, changeThreadList] = useState([]);
 	const [contactInfo, changeContactInfo] = useState({});
 	const [twilioNumbers, changeTwilioNumbers] = useState([]);
+	const [recipientOptions, changeRecientOptions] = useState([]);
+
+	/**
+	 * Iframe containers
+	 */
 	const [twilioNumberContainer, changetwilioNumberContainer] = useState(null);
 	const [recipentContainer, changeRecipientContainer] = useState(null);
-	const [recipientOptions, changeRecientOptions] = useState([]);
+
+	/**
+	 * Search recipient loading status
+	 */
 	const [searchLoading, changeSearchLoading] = useState(false);
 
+	/**
+	 * Message body content to be sent to the backend
+	 */
 	const messageBody = {
+		conversation_id: useInput(),
 		contact_number_id: useInput([]),
 		message: useInput(),
 		twilio_number_id: useInput(),
 		sending: useState(false)
 	};
+
+	/**
+	 * Ant Design props
+	 */
 	const { TextArea } = Input;
 	const Option = Select.Option;
 
+	/**
+	 * Check if props has receive a contact_id
+	 * if so it will get the coversation thread
+	 * else it will get the twilio numbers
+	 */
 	useEffect(() => {
-		if (!checkInfo() && props.id) {
-			console.log(props);
-			getList();
+		if (!checkInfo() && props.contact_id) {
+			getList(props.contact_id);
 		} else {
 			getTwilioNumbers();
 		}
 		messageBody.contact_number_id.handleChange(props.contact_id);
-	}, [contactInfo, props.id]);
+	}, [contactInfo, props.contact_id]);
 
+	/**
+	 * Get the dropdown html so i can set it to where it belongs
+	 */
 	useEffect(() => {
 		if (twilioNumberContainer != null) {
 			if (typeof twilioNumberContainer !== 'undefined') {
@@ -65,7 +92,15 @@ export default function Thread(props) {
 					'lnx-twilio-number-container';
 			}
 		}
-	}, [twilioNumberContainer, contactInfo, props.id]);
+	}, [twilioNumberContainer, contactInfo, props.contact_id]);
+
+	function handleChangeTwilioNumber() {
+		setTimeout(() => {
+			changetwilioNumberContainer(
+				document.getElementsByClassName('lnx-menu-overlay')[0]
+			);
+		}, 10);
+	}
 
 	useEffect(() => {
 		if (recipentContainer != null) {
@@ -76,10 +111,71 @@ export default function Thread(props) {
 		}
 	}, [recipentContainer]);
 
+	function handleChangeRecipientContainer() {
+		setTimeout(() => {
+			changeRecipientContainer(
+				document.getElementsByClassName('ant-select-dropdown')[0]
+			);
+		}, 10);
+	}
+
+	/**
+	 * View new message once the conversation is opened
+	 */
 	useEffect(() => {
 		viewNewMessage();
 	}, [threadList]);
 
+	/**
+	 * Check if there is an existing contact info
+	 *
+	 * @return Boolean
+	 */
+	function checkInfo() {
+		return Object.keys(contactInfo).length ? true : false;
+	}
+
+	/**
+	 * Updates the message reciepients
+	 *
+	 */
+	function updateRecipientOptions(recipientIds) {
+		messageBody.contact_number_id.handleChange(recipientIds);
+	}
+
+	/**
+	 * Updates the message sender
+	 *
+	 */
+	function updateTwilioNumberId({ key }) {
+		messageBody.twilio_number_id.handleChange(key);
+	}
+
+	/**
+	 * Containes the twilio number options
+	 *
+	 * @returns RsJX
+	 */
+	function twilioNumbersOption() {
+		return (
+			<Menu className={'lnx-menu-overlay'} onClick={updateTwilioNumberId}>
+				{twilioNumbers.map(({ id, contact_number }) => {
+					return (
+						<Menu.Item key={id}>
+							<Icon type="user" />
+							{contact_number}
+						</Menu.Item>
+					);
+				})}
+			</Menu>
+		);
+	}
+
+	/**
+	 * Search for the reciepient of the message
+	 *
+	 * @returns RsJX
+	 */
 	async function searchRecipient(inputValue) {
 		try {
 			changeSearchLoading(true);
@@ -103,27 +199,24 @@ export default function Thread(props) {
 		} catch (error) {}
 	}
 
-	function updateRecipientOptions(recipientId) {
-		messageBody.contact_number_id.handleChange(recipientId);
-	}
-
-	function handleSendMessage() {
+	/**
+	 * Send's the message
+	 */
+	async function handleSendMessage() {
 		let {
+			conversation_id,
 			contact_number_id,
 			message: { value },
 			twilio_number_id
 		} = messageBody;
 
 		let body = {
-			contact_number_id: contact_number_id.value,
-			twilio_number_id: twilio_number_id.value,
+			conversation_id: useValue(conversation_id),
+			contact_number_id: useValue(contact_number_id),
+			twilio_number_id: useValue(twilio_number_id),
 			message: value
 		};
 
-		sendMessage(body);
-	}
-
-	async function sendMessage(body) {
 		try {
 			if (body.contact_number_id.length > 1) {
 				await sendNewConversation(body);
@@ -132,49 +225,14 @@ export default function Thread(props) {
 					data: { data }
 				} = await sendConversation(body);
 				changeThreadList([...threadList, data]);
+				messageBody.message.handleChange(null);
 			}
 		} catch (error) {}
 	}
 
-	function twilioNumbersOption() {
-		return (
-			<Menu className={'lnx-menu-overlay'} onClick={setTwilioNumberId}>
-				{twilioNumbers.map(({ id, contact_number }) => {
-					return (
-						<Menu.Item key={id}>
-							<Icon type="user" />
-							{contact_number}
-						</Menu.Item>
-					);
-				})}
-			</Menu>
-		);
-	}
-
-	function setTwilioNumberId(twilioNumber) {
-		messageBody.twilio_number_id.handleChange(twilioNumber.key);
-	}
-
-	function handleChangeTwilioNumber() {
-		setTimeout(() => {
-			changetwilioNumberContainer(
-				document.getElementsByClassName('lnx-menu-overlay')[0]
-			);
-		}, 10);
-	}
-
-	function handleChangeRecipientContainer() {
-		setTimeout(() => {
-			changeRecipientContainer(
-				document.getElementsByClassName('ant-select-dropdown')[0]
-			);
-		}, 10);
-	}
-
-	function checkInfo() {
-		return Object.keys(contactInfo).length ? true : false;
-	}
-
+	/**
+	 * Get the twilio numbers
+	 */
 	async function getTwilioNumbers() {
 		try {
 			let {
@@ -185,13 +243,18 @@ export default function Thread(props) {
 		} catch (error) {}
 	}
 
-	async function getList() {
+	/**
+	 * Get the conversation messages
+	 *
+	 * @param contactId
+	 */
+	async function getList(contactId) {
 		try {
 			const {
 				data: {
-					data: { contact_id, twilio_number_id, messages, contact }
+					data: { id, contact_id, twilio_number_id, messages, contact }
 				}
-			} = await showConversation(props.contact_id);
+			} = await showConversation(contactId);
 
 			let list = messages.map(
 				({ message, direction, created_at, user, status }) => {
@@ -211,6 +274,7 @@ export default function Thread(props) {
 
 			messageBody.twilio_number_id.handleChange(twilio_number_id);
 			messageBody.contact_number_id.handleChange(contact_id);
+			messageBody.conversation_id.handleChange(id);
 			changeThreadList(list);
 			changeContactInfo(contact);
 			debounce(viewNewMessage, 50);
@@ -224,15 +288,22 @@ export default function Thread(props) {
 		}
 	}
 
+	/**
+	 * Delete conversation
+	 */
+	async function deleteConversation() {
+		try {
+			await destroyConversation(messageBody.conversation_id.value);
+		} catch (error) {}
+	}
+
+	/**
+	 * get the container of the thread
+	 * then view the lastest message of the thread
+	 */
 	function viewNewMessage() {
-		/**
-		 * get the container of the thread
-		 */
 		let thread = iframeDocument.getElementsByClassName('lnx-thread-body')[0];
 
-		/**
-		 * view the lastest message of the thread
-		 */
 		thread.scrollTop = thread.scrollHeight;
 	}
 
@@ -256,12 +327,11 @@ export default function Thread(props) {
 						) : (
 							<Select
 								mode="multiple"
-								// value={[]}
 								showSearch
 								style={{ width: '100%' }}
 								placeholder="Add recipient"
 								onChange={debounce(updateRecipientOptions, 50)}
-								onSearch={debounce(searchRecipient, 60)}
+								onSearch={debounce(searchRecipient, 50)}
 								filterOption={false}
 								onDropdownVisibleChange={handleChangeRecipientContainer}
 								loading={searchLoading}
@@ -275,14 +345,15 @@ export default function Thread(props) {
 					span={checkInfo() ? 4 : ''}
 					className={'lnx-thread-header-icon-container'}
 				>
-					<Icon
-						onClick={() => {
-							console.log('asd');
-						}}
-						theme="filled"
-						type="trash"
-						className={'lnx-thread-header-add-icon'}
-					/>
+					{checkInfo() ? (
+						<Icon
+							onClick={deleteConversation}
+							type="delete"
+							className={'lnx-thread-header-delete-icon'}
+						/>
+					) : (
+						''
+					)}
 				</Col>
 			</Row>
 			<Row className={'lnx-thread-body'}>

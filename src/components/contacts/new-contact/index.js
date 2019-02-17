@@ -1,4 +1,4 @@
-import React, { useEffect, useState, Fragment, useContext } from 'react';
+import React, { useEffect, Fragment, useContext } from 'react';
 import { Row, Col, Button, Divider, Icon, Input, InputNumber } from 'antd';
 import './index.css';
 import UploadContact from './upload-contact';
@@ -77,8 +77,15 @@ export default function NewContact(props) {
 		} catch (error) {}
 	}
 
+	/**
+	 * Go to conversation
+	 */
 	function newMessage() {
-		context.component.renderComponent('Thread', props);
+		context.component.renderComponent('Thread', {
+			contact_id: props.id,
+			title: props.title,
+			descriptio: props.description
+		});
 	}
 
 	return (

@@ -1,12 +1,26 @@
 import { useState, useEffect } from 'react';
 import { goTo } from 'route-lite';
-import { updateCurrentComponent, getCurrentComponent } from '../services';
+import {
+	updateCurrentComponent,
+	getCurrentComponent,
+	IsAuthenticated
+} from '../services';
 import Inbox from '../components/inbox';
 import Contacts from '../components/contacts';
 import Settings from '../components/settings';
 import Login from '../components/login';
 import NewContact from '../components/contacts/new-contact';
 import Thread from '../components/thread';
+
+function useLogin() {
+	let [isLoggedIn, changeIsLoggedIn] = useState(false);
+
+	function changeLoginStatus(value) {
+		changeIsLoggedIn(value);
+	}
+
+	return { isLoggedIn, changeLoginStatus };
+}
 
 function useValue(state) {
 	return state.value;
@@ -106,4 +120,4 @@ function useComponent() {
 	return { currentComponent, renderComponent };
 }
 
-export { useComponent, useInput, useNumber, useValue };
+export { useComponent, useInput, useNumber, useValue, useLogin };

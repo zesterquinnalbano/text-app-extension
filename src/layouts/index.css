@@ -1,6 +1,6 @@
 .lnx-main-header {
   text-align: right;
-  vertical-align: middle
+  vertical-align: middle;
 }
 
 .lnx-main-header .ant-layout-header {
@@ -8,7 +8,7 @@
 }
 
 .lnx-add-contact-button {
-  margin-right: 20px
+  margin-right: 20px;
 }
 
 .lnx-close-icon {
