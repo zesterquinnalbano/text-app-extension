@@ -1,13 +1,9 @@
-import axios from 'axios';
+import { get, post, patch } from './api-handler';
 
 function listContact(query = null) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.get(`contacts`, {
-				params: {
-					q: query
-				}
-			});
+			const response = get(`contacts`, query);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -18,7 +14,7 @@ function listContact(query = null) {
 function storeContact(data) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`contacts/store`, data);
+			const response = post(`contacts/store`, data);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -29,7 +25,7 @@ function storeContact(data) {
 function editContact(id) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.get(`contacts/${id}/edit`);
+			const response = get(`contacts/${id}/edit`);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -40,7 +36,7 @@ function editContact(id) {
 function updateContact(id, data) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.patch(`contacts/${id}/update`, data);
+			const response = patch(`contacts/${id}/update`, data);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -51,7 +47,7 @@ function updateContact(id, data) {
 function destroyContact(id) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`contacts/${id}/destroy`);
+			const response = post(`contacts/${id}/destroy`);
 			resolve(response);
 		} catch (error) {
 			reject(error);

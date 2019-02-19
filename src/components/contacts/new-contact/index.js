@@ -84,7 +84,7 @@ export default function NewContact(props) {
 		context.component.renderComponent('Thread', {
 			contact_id: props.id,
 			title: props.title,
-			descriptio: props.description
+			description: props.description
 		});
 	}
 

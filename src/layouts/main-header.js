@@ -23,16 +23,21 @@ export default function MainHeader() {
 	return (
 		<Row className={'lnx-main-header'}>
 			<Header>
-				<Button
-					onClick={() => {
-						updateComponent('NewContact');
-					}}
-					className={'lnx-add-contact-button'}
-					type="primary"
-				>
-					<Icon type="user-add" />
-					New Contact
-				</Button>
+				{context.component.isLoggedIn ? (
+					<Button
+						onClick={() => {
+							updateComponent('NewContact');
+						}}
+						className={'lnx-add-contact-button'}
+						type="primary"
+					>
+						<Icon type="user-add" />
+						New Contact
+					</Button>
+				) : (
+					''
+				)}
+
 				<Icon
 					onClick={() => {
 						console.log('clicked');

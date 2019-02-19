@@ -1,11 +1,11 @@
 import { useContext, useState } from 'react';
-import axios from 'axios';
+import { post } from '../resources/api-handler';
 import AppContext from '../context/app-context';
 
 function Authenticate(data) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`login`, data);
+			const response = post(`login`, data);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -27,17 +27,17 @@ function IsAuthenticated() {
 	}
 }
 
-function updateCurrentComponent(component, props) {
+function updateCurrentComponent(component, props, isLoggedIn) {
 	localStorage.setItem(
 		'text_app_current_component',
-		JSON.stringify({ component, props })
+		JSON.stringify({ component, props, isLoggedIn })
 	);
 }
 
 function getCurrentComponent() {
 	return localStorage.getItem('text_app_current_component')
 		? JSON.parse(localStorage.getItem('text_app_current_component'))
-		: { component: null, props: null };
+		: { component: null, props: null, isLoggedIn: false };
 }
 
 export {

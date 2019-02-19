@@ -56,6 +56,7 @@ function useNumber(initValue = null) {
 
 function useComponent() {
 	let [currentComponent, changeCurrentComponent] = useState(null);
+	let [isLoggedIn, changeIsLoggedIn] = useState(false);
 
 	/**
 	 * get the latest component in the localStorage
@@ -64,8 +65,19 @@ function useComponent() {
 
 	useEffect(() => {
 		if (!component) {
+			/**
+			 * update current component in the localStorage
+			 */
+			updateComponent(component, props);
+			/**
+			 * set the component to  Login
+			 */
 			changeCurrentComponent(goTo(Login));
 		} else {
+			/**
+			 * update current component in the localStorage
+			 */
+			updateComponent(component, props);
 			/**
 			 * set the view to the latest component from the localStorage
 			 */
@@ -105,11 +117,19 @@ function useComponent() {
 		}
 	}
 
+	function updateComponent(component, props) {
+		if (localStorage.getItem('text_app_token')) {
+			changeIsLoggedIn(true);
+		}
+
+		updateCurrentComponent(component, props, isLoggedIn);
+	}
+
 	function renderComponent(component, props = null) {
 		/**
 		 * update current component in the localStorage
 		 */
-		updateCurrentComponent(component, props);
+		updateComponent(component, props);
 
 		/**
 		 * set the view to the latest component passed by the sub header
@@ -117,7 +137,7 @@ function useComponent() {
 		checkComponent(component, props);
 	}
 
-	return { currentComponent, renderComponent };
+	return { currentComponent, renderComponent, isLoggedIn };
 }
 
 export { useComponent, useInput, useNumber, useValue, useLogin };

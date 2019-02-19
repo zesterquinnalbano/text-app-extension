@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState, Fragment } from 'react';
 import {
-	Spin,
 	Row,
 	List,
 	Input,
@@ -10,12 +9,9 @@ import {
 	Select,
 	Menu,
 	Dropdown,
-	Button,
-	message,
-	Mention
+	Button
 } from 'antd';
 import moment from 'moment';
-import InfiniteScroll from 'react-infinite-scroller';
 import AppContext from '../../context/app-context';
 import './index.css';
 import {
@@ -26,11 +22,11 @@ import {
 } from '../../resources/conversation';
 import { listTwilioNumbers } from '../../resources/twilio-numbers';
 import { listContact } from '../../resources/contact';
-import { debounce } from 'lodash';
+import { debounce, reverse } from 'lodash';
 import { useInput, useValue } from '../../states';
 
 export default function Thread(props) {
-	const { iframeDocument } = useContext(AppContext);
+	const { iframeWindow, iframeDocument, component } = useContext(AppContext);
 
 	/**
 	 * Information variables
@@ -39,7 +35,6 @@ export default function Thread(props) {
 	const [contactInfo, changeContactInfo] = useState({});
 	const [twilioNumbers, changeTwilioNumbers] = useState([]);
 	const [recipientOptions, changeRecientOptions] = useState([]);
-
 	/**
 	 * Iframe containers
 	 */
@@ -47,9 +42,18 @@ export default function Thread(props) {
 	const [recipentContainer, changeRecipientContainer] = useState(null);
 
 	/**
-	 * Search recipient loading status
+	 * Loading States
 	 */
 	const [searchLoading, changeSearchLoading] = useState(false);
+	const [loadMore, changeLoadMore] = useState(false);
+
+	/**
+	 * Load more page start
+	 */
+	const [pageStart, changePageStart] = useState(1);
+	const [loadMoreCount, changeLoadMoreCount] = useState(0);
+
+	const [firstLoad, changeFirstLoad] = useState(true);
 
 	/**
 	 * Message body content to be sent to the backend
@@ -62,11 +66,19 @@ export default function Thread(props) {
 		sending: useState(false)
 	};
 
+	const pageLimit = 15;
+
 	/**
 	 * Ant Design props
 	 */
 	const { TextArea } = Input;
 	const Option = Select.Option;
+
+	useEffect(() => {
+		if (firstLoad) {
+			changeFirstLoad(false);
+		}
+	}, [firstLoad]);
 
 	/**
 	 * Check if props has receive a contact_id
@@ -124,7 +136,7 @@ export default function Thread(props) {
 	 */
 	useEffect(() => {
 		viewNewMessage();
-	}, [threadList]);
+	}, [contactInfo]);
 
 	/**
 	 * Check if there is an existing contact info
@@ -224,8 +236,13 @@ export default function Thread(props) {
 				let {
 					data: { data }
 				} = await sendConversation(body);
-				changeThreadList([...threadList, data]);
+
+				messageBody.conversation_id.handleChange(data.conversation_id);
 				messageBody.message.handleChange(null);
+
+				changeThreadList([...threadList, data]);
+				changeLoadMoreCount(threadList.length);
+				viewNewMessage();
 			}
 		} catch (error) {}
 	}
@@ -250,34 +267,27 @@ export default function Thread(props) {
 	 */
 	async function getList(contactId) {
 		try {
+			let page = pageStart;
+
 			const {
 				data: {
 					data: { id, contact_id, twilio_number_id, messages, contact }
 				}
-			} = await showConversation(contactId);
+			} = await showConversation(contactId, {
+				limit: pageLimit,
+				offset: pageLimit * (page - 1)
+			});
 
-			let list = messages.map(
-				({ message, direction, created_at, user, status }) => {
-					let sent_by = null;
-					if (user) {
-						sent_by = user.firstname;
-					}
-					return {
-						message,
-						direction,
-						created_at,
-						sent_by,
-						status
-					};
-				}
-			);
+			let list = transformMessage(messages);
 
 			messageBody.twilio_number_id.handleChange(twilio_number_id);
 			messageBody.contact_number_id.handleChange(contact_id);
 			messageBody.conversation_id.handleChange(id);
-			changeThreadList(list);
+			changeThreadList(reverse(list));
 			changeContactInfo(contact);
-			debounce(viewNewMessage, 50);
+			changePageStart(++page);
+			changeLoadMoreCount(list.length);
+			// debounce(viewNewMessage, 50);
 		} catch (error) {
 			let info = {
 				fullname: props.title,
@@ -294,7 +304,44 @@ export default function Thread(props) {
 	async function deleteConversation() {
 		try {
 			await destroyConversation(messageBody.conversation_id.value);
+			component.renderComponent('Inbox');
 		} catch (error) {}
+	}
+
+	async function loadMoreMessages() {
+		try {
+			let page = pageStart;
+			const {
+				data: {
+					data: { messages }
+				}
+			} = await showConversation(props.contact_id, {
+				limit: pageLimit,
+				offset: pageLimit * (page - 1)
+			});
+
+			let list = transformMessage(messages);
+
+			changeThreadList([...reverse(list), ...threadList]);
+			changePageStart(++page);
+			changeLoadMoreCount(list.length);
+		} catch (error) {}
+	}
+
+	function transformMessage(messages) {
+		return messages.map(({ message, direction, created_at, user, status }) => {
+			let sent_by = null;
+			if (user) {
+				sent_by = user.firstname;
+			}
+			return {
+				message,
+				direction,
+				created_at,
+				sent_by,
+				status
+			};
+		});
 	}
 
 	/**
@@ -342,10 +389,10 @@ export default function Thread(props) {
 					</div>
 				</Col>
 				<Col
-					span={checkInfo() ? 4 : ''}
+					span={checkInfo() && threadList.length ? 4 : ''}
 					className={'lnx-thread-header-icon-container'}
 				>
-					{checkInfo() ? (
+					{checkInfo() && threadList.length ? (
 						<Icon
 							onClick={deleteConversation}
 							type="delete"
@@ -358,52 +405,53 @@ export default function Thread(props) {
 			</Row>
 			<Row className={'lnx-thread-body'}>
 				<Col>
-					<InfiniteScroll
-						className={'lnx-thread-message-inifinite-scroll'}
-						initialLoad={false}
-						pageStart={1}
-						useWindow={false}
-						loadMore={() => {
-							console.log('loaded');
-						}}
-					>
-						<List
-							itemLayout="horizontal"
-							dataSource={threadList}
-							bordered
-							renderItem={item => (
-								<Fragment>
-									<List.Item
-										className={`lnx-thread ${
-											item.direction == 'INBOUND'
-												? 'lnx-thread-inbound'
-												: 'lnx-thread-outbound'
-										}`}
-									>
-										<Card className={'lnx-thread-message-card'}>
-											<p className={'lnx-thread-message-content'}>
-												{item.message}
+					{loadMoreCount == pageLimit ? (
+						<Button
+							className={'lnx-load-more-button'}
+							type="default"
+							onClick={loadMoreMessages}
+						>
+							Load more
+						</Button>
+					) : (
+						''
+					)}
+					<List
+						itemLayout="horizontal"
+						dataSource={threadList}
+						bordered
+						loading={loadMore}
+						renderItem={item => (
+							<Fragment>
+								<List.Item
+									className={`lnx-thread ${
+										item.direction == 'INBOUND'
+											? 'lnx-thread-inbound'
+											: 'lnx-thread-outbound'
+									}`}
+								>
+									<Card className={'lnx-thread-message-card'}>
+										<p className={'lnx-thread-message-content'}>
+											{item.message}
+										</p>
+										<p className={'lnx-thread-message-time'}>
+											{item.status != 'failed'
+												? moment(item.created_at).fromNow()
+												: 'Failed'}
+										</p>
+										<br />
+										{item.direction == 'OUTBOUND' ? (
+											<p className={'lnx-thread-message-sender'}>
+												Sent by {item.sent_by}
 											</p>
-											<div>
-												<p className={'lnx-thread-message-time'}>
-													{item.status == 'sent'
-														? moment(item.created_at).format('h:mm a')
-														: 'Failed'}
-												</p>
-												{item.direction == 'OUTBOUND' ? (
-													<p className={'lnx-thread-message-sender'}>
-														{item.sent_by}
-													</p>
-												) : (
-													''
-												)}
-											</div>
-										</Card>
-									</List.Item>
-								</Fragment>
-							)}
-						/>
-					</InfiniteScroll>
+										) : (
+											''
+										)}
+									</Card>
+								</List.Item>
+							</Fragment>
+						)}
+					/>
 				</Col>
 			</Row>
 			<Row className={'lnx-thread-textarea'}>

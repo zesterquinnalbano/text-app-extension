@@ -73,7 +73,7 @@
 
 .lnx-thread-message-sender {
   margin-bottom: 0px;
-  float: left;
+  float: right;
   font-size: smaller;
   font-style: italic;
 }
@@ -133,4 +133,10 @@
   right: 14px;
   width: 345px !important;
   z-index: 13123123123123;
+}
+
+.lnx-load-more-button {
+  margin-left: 8.3rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }

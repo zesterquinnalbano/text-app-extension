@@ -3,6 +3,7 @@ import { Row, Col } from 'antd';
 import AppContext from '../../context/app-context';
 import ListContainer from '../common/list-container';
 import { listContact } from '../../resources/contact';
+import './index.css';
 
 export default function ContactListContainer() {
 	/**
@@ -17,12 +18,15 @@ export default function ContactListContainer() {
 
 	const [firstLoad, changeFirstLoad] = useState(true);
 
-	useEffect(() => {
-		if (firstLoad) {
-			getList();
-			changeFirstLoad(false);
-		}
-	}, [firstLoad, ...contactList]);
+	useEffect(
+		() => {
+			if (firstLoad) {
+				getList();
+				changeFirstLoad(false);
+			}
+		},
+		[firstLoad, ...contactList]
+	);
 
 	async function getList() {
 		try {
@@ -48,15 +52,16 @@ export default function ContactListContainer() {
 	}
 
 	return (
-		<Row className={'lnx-contacts-container'}>
+		<Row className={'lnx-contact-list-container'}>
 			<Col>
 				<ListContainer
-					pageStart={1}
-					loadMore={value => {
-						console.log(value);
+					pageStart={0}
+					loadMore={() => {
+						console.log('lol');
 					}}
 					selectedRow={selectedRow}
 					data={contactList}
+					hasMore={true}
 					rowContent={item => {
 						// return (
 						// 	<Fragment>

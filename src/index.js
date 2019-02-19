@@ -40,6 +40,12 @@ const app = document.createElement('div');
 app.id = 'lnx-app-container';
 document.body.appendChild(app);
 
+var script = document.createElement('script');
+document.createElement('script');
+script.type = 'text/javascript';
+script.src = 'https://js.pusher.com/4.4/pusher.min.js';
+// const app = document.getElementById('lnx-app-container');
+
 /**
  * hide the extension in the brower
  */
@@ -68,4 +74,5 @@ function toggle() {
 /**
  * render the app
  */
+console.log('reactdom');
 ReactDOM.render(<Content />, app);

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@babel/core": "7.1.6",
+    "@babel/plugin-transform-runtime": "^7.2.0",
     "@babel/polyfill": "^7.2.5",
     "@svgr/webpack": "2.4.1",
     "antd": "^3.13.1",
@@ -43,6 +44,7 @@
     "postcss-loader": "3.0.0",
     "postcss-preset-env": "6.3.1",
     "postcss-safe-parser": "4.0.1",
+    "pusher-js": "^4.4.0",
     "react": "^16.8.0",
     "react-app-polyfill": "^0.2.0",
     "react-css-modules": "^4.7.9",
@@ -127,6 +129,15 @@
           "libraryName": "antd",
           "libraryDirectory": "es",
           "style": "css"
+        }
+      ],
+      [
+        "@babel/plugin-transform-runtime",
+        {
+          "corejs": false,
+          "helpers": true,
+          "regenerator": true,
+          "useESModules": false
         }
       ]
     ]

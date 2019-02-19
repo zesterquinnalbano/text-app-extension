@@ -7,10 +7,11 @@ export default function ListContainer(props) {
 	return (
 		<InfiniteScroll
 			className={'lnx-list-contaner-inifinite-scroll'}
-			initialLoad={true}
+			initialLoad={false}
 			pageStart={props.pageStart}
 			useWindow={false}
 			loadMore={props.loadMore}
+			hasMore={props.hasMore}
 		>
 			<List
 				itemLayout="horizontal"

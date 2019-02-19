@@ -4,15 +4,11 @@ import AppContext from '../../context/app-context';
 import ListContainer from '../common/list-container';
 import { listConversation } from '../../resources/conversation';
 import moment from 'moment';
+import EventHandler from '../../resources/event-handler';
+import { reverse } from 'lodash';
 
-// const data = [
-// 	{
-// 		id: 1,
-// 		title: 'Contact 1',
-// 		description: 'Message asdasd ...',
-// 		time: '9:30pm'
-// 	}
-// ];
+const ev = EventHandler();
+ev.newMessageRecieved();
 
 export default function MessageContainer() {
 	/**
@@ -29,7 +25,7 @@ export default function MessageContainer() {
 			getList();
 			changeFirstLoad(false);
 		}
-	}, [firstLoad, ...conversationList]);
+	}, [firstLoad, conversationList]);
 
 	async function getList() {
 		try {
@@ -38,16 +34,22 @@ export default function MessageContainer() {
 			} = await listConversation();
 
 			let list = data.data.map(({ id, message, contact }) => {
+				let messageString = message.message.substring(0, 30);
+
+				if (messageString.length >= 30) {
+					messageString = messageString.concat('.....', '');
+				}
+
 				return {
 					id,
 					contact_id: contact.id,
 					title: contact.fullname,
-					description: message.message,
+					description: messageString,
 					created_at: message.created_at
 				};
 			});
 
-			changeConversationList(list);
+			changeConversationList(reverse(list));
 		} catch (error) {}
 	}
 

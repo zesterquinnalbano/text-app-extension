@@ -1,9 +1,9 @@
-import axios from 'axios';
+import { get, post } from '../resources/api-handler';
 
 function listConversation() {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.get(`conversations`);
+			const response = get(`conversations`);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -14,7 +14,7 @@ function listConversation() {
 function sendConversation(data) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`conversations/send`, data);
+			const response = post(`conversations/send`, data);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -25,7 +25,7 @@ function sendConversation(data) {
 function sendNewConversation(data) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`conversations/send-new`, data);
+			const response = post(`conversations/send-new`, data);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -33,10 +33,10 @@ function sendNewConversation(data) {
 	});
 }
 
-function showConversation(id) {
+function showConversation(id, params = null) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.get(`conversations/${id}`);
+			const response = get(`conversations/${id}`, params);
 			resolve(response);
 		} catch (error) {
 			reject(error);
@@ -47,7 +47,7 @@ function showConversation(id) {
 function destroyConversation(id) {
 	return new Promise((resolve, reject) => {
 		try {
-			const response = axios.post(`conversations/${id}/destroy`);
+			const response = post(`conversations/${id}/destroy`);
 			resolve(response);
 		} catch (error) {
 			reject(error);

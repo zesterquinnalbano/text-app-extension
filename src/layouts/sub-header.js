@@ -24,20 +24,27 @@ export default function SubHeader(props) {
 
 	return (
 		<Row id="lnx-sub-header" className={'lnx-sub-header'}>
-			<Menu mode="horizontal" defaultSelectedKeys={[latestComponent.component]}>
-				<Menu.Item key="Inbox" onClick={() => updateComponent('Inbox')}>
-					<Icon type="inbox" />
-					Inbox
-				</Menu.Item>
-				<Menu.Item key="Contacts" onClick={() => updateComponent('Contacts')}>
-					<Icon type="team" />
-					Contacts
-				</Menu.Item>
-				<Menu.Item key="Settings" onClick={() => updateComponent('Settings')}>
-					<Icon type="setting" />
-					Settings
-				</Menu.Item>
-			</Menu>
+			{context.component.isLoggedIn ? (
+				<Menu
+					mode="horizontal"
+					defaultSelectedKeys={[latestComponent.component]}
+				>
+					<Menu.Item key="Inbox" onClick={() => updateComponent('Inbox')}>
+						<Icon type="inbox" />
+						Inbox
+					</Menu.Item>
+					<Menu.Item key="Contacts" onClick={() => updateComponent('Contacts')}>
+						<Icon type="team" />
+						Contacts
+					</Menu.Item>
+					<Menu.Item key="Settings" onClick={() => updateComponent('Settings')}>
+						<Icon type="setting" />
+						Settings
+					</Menu.Item>
+				</Menu>
+			) : (
+				''
+			)}
 		</Row>
 	);
 }
