@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { Menu, Icon, Row } from 'antd';
-import './index.css';
+import styles from './index.css';
 import AppContext from '../context/app-context';
-import { getCurrentComponent, IsAuthenticated } from '../services';
+import { getCurrentComponent } from '../services';
 
 export default function SubHeader(props) {
 	/**
@@ -23,7 +23,7 @@ export default function SubHeader(props) {
 	}
 
 	return (
-		<Row id="lnx-sub-header" className={'lnx-sub-header'}>
+		<Row id="lnx-sub-header" className={styles.lnxSubHeader}>
 			{context.component.isLoggedIn ? (
 				<Menu
 					mode="horizontal"

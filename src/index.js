@@ -3,16 +3,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Frame, { FrameContextConsumer } from 'react-frame-component';
 import Links from './utils/links';
-import 'antd/dist/antd.css';
-import './index.css';
+import styles from './index.css';
 import Layout from './layouts';
+import { refreshToken } from './resources/api-handler';
 
 function Content() {
 	return (
 		/**
 		 * head: array of <link> will be imported to iframe
 		 */
-		<Frame head={[...Links]}>
+		<Frame className={styles.iFrame} head={[...Links]}>
 			<FrameContextConsumer>
 				{/**
 				 * Callback is invoked with iframe's window and document instances
@@ -34,17 +34,22 @@ function Content() {
 }
 
 /**
+ * refresh authorization when page is refreshed
+ */
+if (
+	performance.navigation.type == 1 &&
+	localStorage.getItem('text_app_token')
+) {
+	refreshToken();
+}
+
+/**
  * append the element that will be used in the extension
  */
 const app = document.createElement('div');
 app.id = 'lnx-app-container';
+app.className = styles.lnxAppContainer;
 document.body.appendChild(app);
-
-var script = document.createElement('script');
-document.createElement('script');
-script.type = 'text/javascript';
-script.src = 'https://js.pusher.com/4.4/pusher.min.js';
-// const app = document.getElementById('lnx-app-container');
 
 /**
  * hide the extension in the brower
@@ -74,5 +79,4 @@ function toggle() {
 /**
  * render the app
  */
-console.log('reactdom');
 ReactDOM.render(<Content />, app);

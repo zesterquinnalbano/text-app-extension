@@ -1,6 +1,6 @@
 import React from 'react';
 import { Upload, Icon, Button } from 'antd';
-import './index.css';
+import styles from './index.css';
 
 export default function UploadContact() {
 	const props = {
@@ -13,7 +13,7 @@ export default function UploadContact() {
 	};
 
 	return (
-		<Upload {...props} className="upload-container">
+		<Upload {...props} className={styles.uploadContainer}>
 			<Button block>
 				<Icon type="upload" /> Upload .csv
 			</Button>

@@ -1,13 +1,15 @@
-import { get } from '../resources/api-handler';
+import { get, logoutIfUnauthorized } from '../resources/api-handler';
 
 function listTwilioNumbers() {
 	return new Promise((resolve, reject) => {
-		try {
-			const response = get(`twilio-numbers`);
-			resolve(response);
-		} catch (error) {
-			reject(error);
-		}
+		get(`twilio-numbers`)
+			.then(response => {
+				resolve(response);
+			})
+			.catch(error => {
+				logoutIfUnauthorized(error);
+				reject(error);
+			});
 	});
 }
 

@@ -1,9 +1,8 @@
 import React, { useContext } from 'react';
 import { Icon, Row, Layout, Button } from 'antd';
-import './index.css';
+import styles from './index.css';
 import AppContext from '../context/app-context';
-import { IsAuthenticated } from '../services';
-import { debounce } from 'lodash';
+import 'antd/dist/antd.css';
 
 export default function MainHeader() {
 	const { Header } = Layout;
@@ -21,14 +20,14 @@ export default function MainHeader() {
 	}
 
 	return (
-		<Row className={'lnx-main-header'}>
+		<Row className={styles.lnxMainHeader}>
 			<Header>
 				{context.component.isLoggedIn ? (
 					<Button
 						onClick={() => {
 							updateComponent('NewContact');
 						}}
-						className={'lnx-add-contact-button'}
+						className={styles.lnxAddContactButton}
 						type="primary"
 					>
 						<Icon type="user-add" />
@@ -42,7 +41,7 @@ export default function MainHeader() {
 					onClick={() => {
 						console.log('clicked');
 					}}
-					className={'lnx-close-icon'}
+					className={styles.lnxCloseIcon}
 					type="close"
 				/>
 			</Header>

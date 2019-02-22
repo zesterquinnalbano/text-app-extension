@@ -2,7 +2,7 @@ import React from 'react';
 import Router from 'route-lite';
 import './index.css';
 import AppContext from '../context/app-context';
-import { useComponent } from '../states';
+import { useComponent, useInput } from '../states';
 import MainHeader from './main-header';
 import SubHeader from './sub-header';
 
@@ -13,6 +13,11 @@ export default function MainLayout({ iframeDocument, iframeWindow }) {
 		 * then renders the component
 		 */
 		component: useComponent(),
+
+		/**
+		 * handles the message search
+		 */
+		search: useInput(),
 		/**
 		 * get the iframe document body
 		 */

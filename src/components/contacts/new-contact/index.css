@@ -1,49 +1,49 @@
-.lnx-add-contact-content .body {
+.lnxAddContactContent .body {
   padding: 2rem 2.5rem 0rem 2.5rem;
 }
 
-.lnx-add-contact-content .body .ant-input {
+.lnxAddContactContent .body .input {
   margin-top: 1rem
 }
 
-.lnx-add-contact-content .body .ant-input-number {
+.lnxAddContactContent .body .inputNumber {
   margin-top: 1rem;
   width: 100%
 }
 
-.lnx-add-contact-content {
+.lnxAddContactContent {
   overflow: auto;
   height: calc(100vh - 282px) !important
 }
 
-.lnx-add-contact-header {
+.lnxAddContactHeader {
   padding: 15px;
   box-shadow: 1px 5px 8px #d4d4d4;
 }
 
-.lnx-add-contact-header .button-container .save {
+.lnxAddContactHeader .buttonContainer .save {
   background-color: #3bb54f;
   color: white;
 }
 
-.lnx-add-contact-header .title {
+.lnxAddContactHeader .title {
   font-size: large;
   font-weight: 500;
   margin: 0px;
 }
 
-.lnx-add-contact-content .upload-container .ant-upload.ant-upload-select {
+.lnxAddContactContent .uploadContainer div:first-child {
   display: block
 }
 
-.lnx-add-contact-textarea .icon-container .send-icon {
+/* .lnx-add-contact-textarea .icon-container .send-icon {
   margin-top: 25px;
   font-size: 2rem !important;
 }
 
 .lnx-add-contact-textarea .icon-container {
   text-align: center
-}
+} */
 
 .lnx-add-contact-textarea {
   padding-top: 1rem;
@@ -53,10 +53,14 @@
   border-top: 1px solid #dadada
 }
 
-.lnx-add-contact-content .action-button {
+.lnxAddContactContent .actionButton {
   margin-top: 1rem;
 }
 
-.lnx-add-contact-content .action-button .update {
+.lnxAddContactContent .actionButton .update {
   float: right
+}
+
+.lnxAlert .lnxList {
+  padding-left: 0px
 }

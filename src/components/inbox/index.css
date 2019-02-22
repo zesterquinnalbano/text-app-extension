@@ -1,8 +1,57 @@
-.lnx-inbox-message-container {
+.lnxInboxMessageContainer {
   overflow: auto;
   height: calc(100vh - 175px) !important
 }
 
-.lnx-inbox-message-container .ant-badge-not-a-wrapper {
+/* .lnxInboxMessageContainer .ant-badge-not-a-wrapper {
   margin-right: 10px;
+} */
+
+.lnxSearchBar {
+  padding: 15px;
+  box-shadow: 1px 5px 8px #d4d4d4;
+}
+
+.lnxSearchBarButtonContainer {
+  text-align: center
+}
+
+.lnxListContainerContent:hover {
+  background: #40a9ff !important;
+  color: white !important;
+  cursor: pointer;
+}
+
+.lnxListContainerContent.lnxNewMessage {
+  border-left: 6px solid #31c558;
+}
+
+.lnxListContainerContent div div h4 {
+  font-weight: 600 !important;
+  margin-bottom: 0px !important;
+  color: unset !important
+}
+
+.lnxListContainerContent div div div {
+  font-style: italic !important;
+  color: unset !important;
+  font-size: small !important
+}
+
+.lnxListContainerContent {
+  padding: 8px 25px 8px 15px !important
+}
+
+.lnxFormGroup {
+  margin-bottom: .5rem !important;
+}
+
+.lnxLoginContainer .lnxFormGroup:nth-child(2) {
+  margin-bottom: 1.5rem !important;
+}
+
+.lnxLoadMoreContainer {
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }

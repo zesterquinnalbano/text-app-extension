@@ -1,8 +1,45 @@
-.lnx-contact-list-container {
+.lnxContactListContainer {
   overflow: auto;
   height: calc(100vh - 175px) !important
 }
 
-.lnx-contacts-container .send-icon {
+.lnxContactsContainer .send-icon {
   font-size: 2rem
+}
+
+.lnxSearchBar {
+  padding: 15px;
+  box-shadow: 1px 5px 8px #d4d4d4;
+}
+
+.lnxSearchBarButtonContainer {
+  text-align: center
+}
+
+.lnxListContainerContent:hover {
+  background: #40a9ff !important;
+  color: white !important;
+  cursor: pointer;
+}
+
+.lnxListContainerContent div div h4 {
+  font-weight: 600 !important;
+  margin-bottom: 0px !important;
+  color: unset !important
+}
+
+.lnxListContainerContent div div div {
+  font-style: italic !important;
+  color: unset !important;
+  font-size: small !important
+}
+
+.lnxListContainerContent {
+  padding: 8px 25px 8px 15px !important
+}
+
+.lnxLoadMoreContainer {
+  text-align: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }

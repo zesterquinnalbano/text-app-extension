@@ -86,6 +86,13 @@ function useComponent() {
 	});
 
 	/**
+	 * update logged in status
+	 */
+	function handleLoggedIn(value) {
+		changeIsLoggedIn(value);
+	}
+
+	/**
 	 * check the lastest component from localStorage or passed by sub header
 	 * and updated the current component
 	 *
@@ -137,7 +144,7 @@ function useComponent() {
 		checkComponent(component, props);
 	}
 
-	return { currentComponent, renderComponent, isLoggedIn };
+	return { currentComponent, renderComponent, isLoggedIn, handleLoggedIn };
 }
 
 export { useComponent, useInput, useNumber, useValue, useLogin };

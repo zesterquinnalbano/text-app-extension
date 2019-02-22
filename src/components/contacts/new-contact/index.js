@@ -1,6 +1,16 @@
-import React, { useEffect, Fragment, useContext } from 'react';
-import { Row, Col, Button, Divider, Icon, Input, InputNumber } from 'antd';
-import './index.css';
+import React, { useEffect, Fragment, useContext, useState } from 'react';
+import {
+	Row,
+	Col,
+	Button,
+	Divider,
+	Icon,
+	Input,
+	InputNumber,
+	Alert
+} from 'antd';
+import { forEach, head } from 'lodash';
+import styles from './index.css';
 import UploadContact from './upload-contact';
 import { useInput, useNumber, useValue } from '../../../states';
 import AppContext from '../../../context/app-context';
@@ -16,6 +26,10 @@ export default function NewContact(props) {
 	 * get global context
 	 */
 	const context = useContext(AppContext);
+
+	const [errorMessage, changeErrorMessage] = useState(null);
+	const [submitting, changeSubmitting] = useState(false);
+
 	const { TextArea } = Input;
 
 	const contact = {
@@ -46,9 +60,19 @@ export default function NewContact(props) {
 
 	async function store() {
 		try {
-			await storeContact(data);
+			changeSubmitting(true);
+			changeErrorMessage(null);
+			const response = await storeContact(data);
 			redirect();
-		} catch (error) {}
+		} catch ({ response: { data } }) {
+			changeSubmitting(false);
+
+			let error = Object.values(data).map(values => {
+				return <li>{head(values)}</li>;
+			});
+
+			changeErrorMessage(<ul className={styles.lnxList}>{error}</ul>);
+		}
 	}
 
 	async function edit() {
@@ -90,47 +114,69 @@ export default function NewContact(props) {
 
 	return (
 		<Row className="lnx-new-contact-container">
-			{/**
-			 * if page doesn't receive data, form action store() will trigger
-			 * else update() will trigger when submitting
-			 */}
 			<form
 				onSubmit={function(e) {
 					e.preventDefault();
 					props.id ? update() : store();
 				}}
 			>
-				<Row className={'lnx-add-contact-header'}>
+				<Row className={styles.lnxAddContactHeader}>
 					<Col span={props.id ? 14 : 18}>
 						<div>
-							<p className="title">{props.id ? 'Update' : 'Add'} contact</p>
+							<p className={styles.title}>
+								{props.id ? 'Update' : 'Add'} contact
+							</p>
 						</div>
 					</Col>
-					<Col span={props.id ? 8 : 6} className={'button-container'}>
+					<Col span={props.id ? 8 : 6} className={styles.buttonContainer}>
 						{props.id ? (
 							<Button onClick={newMessage} type="primary">
 								<Icon type="message" theme="filled" />
 								Send message
 							</Button>
 						) : (
-							<Button htmlType="submit" type="default" className="save">
+							<Button
+								loading={submitting}
+								htmlType="submit"
+								type="default"
+								className={styles.save}
+							>
 								<Icon type="save" theme="filled" />
 								Save
 							</Button>
 						)}
 					</Col>
 				</Row>
-				<Row className={'lnx-add-contact-content'}>
-					<Col className="body">
-						<Input {...contact.firstname} placeholder="Firstname" />
-						<Input {...contact.lastname} placeholder="Lastname" />
+				<Row className={styles.lnxAddContactContent}>
+					<Col className={styles.body}>
+						{errorMessage ? (
+							<Alert
+								className={styles.lnxAlert}
+								message="Error"
+								description={errorMessage}
+								type="error"
+								showIcon
+							/>
+						) : (
+							''
+						)}
+						<Input
+							className={styles.input}
+							{...contact.firstname}
+							placeholder="Firstname"
+						/>
+						<Input
+							className={styles.input}
+							{...contact.lastname}
+							placeholder="Lastname"
+						/>
 						<InputNumber
-							formatter={value => `+${value}`}
+							className={styles.inputNumber}
 							{...contact.contact_number}
-							placeholder="Phone number eg:1-8002-334175"
+							placeholder="Phone number eg:18002334175"
 						/>
 						{props.id ? (
-							<Row className={'action-button'}>
+							<Row className={styles.actionButton}>
 								<Col>
 									{/* delete button calls function delete */}
 									<Button
@@ -143,7 +189,11 @@ export default function NewContact(props) {
 									>
 										Delete
 									</Button>
-									<Button htmlType="submit" type="primary" className="update">
+									<Button
+										htmlType="submit"
+										type="primary"
+										className={styles.update}
+									>
 										Update
 									</Button>
 								</Col>

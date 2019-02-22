@@ -1,34 +1,39 @@
-.lnx-search-bar {
+.lnxInboxMessageContainer {
+  overflow: auto;
+  height: calc(100vh - 175px) !important
+}
+
+.lnxInboxMessageContainer .ant-badge-not-a-wrapper {
+  margin-right: 10px;
+}
+
+.lnxSearchBar {
   padding: 15px;
   box-shadow: 1px 5px 8px #d4d4d4;
 }
 
-.lnx-search-bar-button-container {
+.lnxSearchBarButtonContainer {
   text-align: center
 }
 
-.lnx-list-container-content:hover {
+.lnxListContainerContent:hover {
   background: #40a9ff !important;
   color: white !important;
   cursor: pointer;
 }
 
-.lnx-list-container-content .ant-list-item-meta-title {
+.lnxListContainerContent .ant-list-item-meta-title {
   font-weight: 600;
   margin-bottom: 0px;
   color: unset
 }
 
-.lnx-list-container-content .ant-list-item-meta-description {
+.lnxListContainerContent .ant-list-item-meta-description {
   font-style: italic;
   color: unset;
   font-size: small
 }
 
-.lnx-list-container-content {
+.lnxListContainerContent {
   padding: 8px 25px 8px 15px !important
 }
-
-/* .lnx-inbox-message-box .ant-badge-not-a-wrapper {
-  margin-right: 10px;
-} */

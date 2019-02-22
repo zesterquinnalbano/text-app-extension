@@ -1,4 +1,5 @@
 import axios from 'axios';
+import AppContext from '../context/app-context';
 
 /**
  * Create axios config defaults
@@ -8,11 +9,11 @@ const instance = axios.create({
 });
 
 function get(url, query = null) {
-	let token = localStorage.getItem('text_app_token');
 	let headers = { 'Content-Type': 'application/json' };
+	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = JSON.stringify(token);
+		headers.Authorization = token;
 	}
 
 	return instance({
@@ -22,18 +23,17 @@ function get(url, query = null) {
 		params: {
 			q: query
 		}
-	}).catch(error => {
-		localStorage.removeItem('text_app_token');
-		localStorage.removeItem('text_app_current_component');
+	}).catch(function(error) {
+		logoutIfUnauthorized(error);
 	});
 }
 
-function post(url, data = null) {
-	let token = localStorage.getItem('text_app_token');
+async function post(url, data = null) {
 	let headers = { 'Content-Type': 'application/json' };
+	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = JSON.stringify(token);
+		headers.Authorization = token;
 	}
 
 	return instance({
@@ -41,18 +41,17 @@ function post(url, data = null) {
 		url,
 		headers,
 		data
-	}).catch(error => {
-		localStorage.removeItem('text_app_token');
-		localStorage.removeItem('text_app_current_component');
+	}).catch(function(error) {
+		logoutIfUnauthorized(error);
 	});
 }
 
-function patch(url, data = null) {
-	let token = localStorage.getItem('text_app_token');
+async function patch(url, data = null) {
 	let headers = { 'Content-Type': 'application/json' };
+	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = JSON.stringify(token);
+		headers.Authorization = token;
 	}
 
 	return instance({
@@ -60,10 +59,33 @@ function patch(url, data = null) {
 		url,
 		headers,
 		data
-	}).catch(error => {
-		localStorage.removeItem('text_app_token');
-		localStorage.removeItem('text_app_current_component');
+	}).catch(function(error) {
+		logoutIfUnauthorized(error);
 	});
 }
 
-export { get, post, patch };
+function logoutIfUnauthorized(error) {
+	if (error.response && error.response.status === 401) {
+		AppContext.component.changeIsLoggedIn(false);
+		AppContext.component.renderComponent('Login');
+	}
+}
+
+function refreshToken() {
+	let currentToken = localStorage.getItem('text_app_token');
+	let headers = { 'Content-Type': 'application/json' };
+
+	if (currentToken) {
+		headers.Authorization = currentToken;
+	}
+
+	return instance({
+		method: 'POST',
+		url: 'auth/refresh',
+		headers
+	}).then(({ data: { token } }) => {
+		localStorage.setItem('text_app_token', JSON.stringify(token));
+	});
+}
+
+export { get, post, patch, logoutIfUnauthorized, refreshToken };

@@ -1,57 +1,67 @@
-import { get, post, patch } from './api-handler';
+import { get, post, patch, logoutIfUnauthorized } from './api-handler';
 
 function listContact(query = null) {
 	return new Promise((resolve, reject) => {
-		try {
-			const response = get(`contacts`, query);
-			resolve(response);
-		} catch (error) {
-			reject(error);
-		}
+		get(`contacts`, query)
+			.then(response => {
+				resolve(response);
+			})
+			.catch(error => {
+				logoutIfUnauthorized(error);
+				reject(error);
+			});
 	});
 }
 
 function storeContact(data) {
 	return new Promise((resolve, reject) => {
-		try {
-			const response = post(`contacts/store`, data);
-			resolve(response);
-		} catch (error) {
-			reject(error);
-		}
+		post(`contacts/store`, data)
+			.then(response => {
+				resolve(response);
+			})
+			.catch(error => {
+				logoutIfUnauthorized(error);
+				reject(error);
+			});
 	});
 }
 
 function editContact(id) {
 	return new Promise((resolve, reject) => {
-		try {
-			const response = get(`contacts/${id}/edit`);
-			resolve(response);
-		} catch (error) {
-			reject(error);
-		}
+		get(`contacts/${id}/edit`)
+			.then(response => {
+				resolve(response);
+			})
+			.catch(error => {
+				logoutIfUnauthorized(error);
+				reject(error);
+			});
 	});
 }
 
 function updateContact(id, data) {
 	return new Promise((resolve, reject) => {
-		try {
-			const response = patch(`contacts/${id}/update`, data);
-			resolve(response);
-		} catch (error) {
-			reject(error);
-		}
+		patch(`contacts/${id}/update`, data)
+			.then(response => {
+				resolve(response);
+			})
+			.catch(error => {
+				logoutIfUnauthorized(error);
+				reject(error);
+			});
 	});
 }
 
 function destroyContact(id) {
 	return new Promise((resolve, reject) => {
-		try {
-			const response = post(`contacts/${id}/destroy`);
-			resolve(response);
-		} catch (error) {
-			reject(error);
-		}
+		post(`contacts/${id}/destroy`)
+			.then(response => {
+				resolve(response);
+			})
+			.catch(error => {
+				logoutIfUnauthorized(error);
+				reject(error);
+			});
 	});
 }
 

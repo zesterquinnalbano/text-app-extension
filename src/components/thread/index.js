@@ -1,4 +1,5 @@
 import React, { useContext, useEffect, useState, Fragment } from 'react';
+import cx from 'classnames';
 import {
 	Row,
 	List,
@@ -9,20 +10,23 @@ import {
 	Select,
 	Menu,
 	Dropdown,
-	Button
+	Button,
+	message
 } from 'antd';
 import moment from 'moment';
 import AppContext from '../../context/app-context';
-import './index.css';
+import styles from './index.css';
 import {
 	showConversation,
 	sendConversation,
 	destroyConversation,
-	sendNewConversation
+	sendNewConversation,
+	updateNewMessage
 } from '../../resources/conversation';
+import EventHandler from '../../resources/event-handler';
 import { listTwilioNumbers } from '../../resources/twilio-numbers';
 import { listContact } from '../../resources/contact';
-import { debounce, reverse } from 'lodash';
+import { debounce, reverse, head } from 'lodash';
 import { useInput, useValue } from '../../states';
 
 export default function Thread(props) {
@@ -35,24 +39,19 @@ export default function Thread(props) {
 	const [contactInfo, changeContactInfo] = useState({});
 	const [twilioNumbers, changeTwilioNumbers] = useState([]);
 	const [recipientOptions, changeRecientOptions] = useState([]);
-	/**
-	 * Iframe containers
-	 */
-	const [twilioNumberContainer, changetwilioNumberContainer] = useState(null);
-	const [recipentContainer, changeRecipientContainer] = useState(null);
 
 	/**
 	 * Loading States
 	 */
 	const [searchLoading, changeSearchLoading] = useState(false);
 	const [loadMore, changeLoadMore] = useState(false);
+	const [sendingMessage, changeSendingMessage] = useState(false);
 
 	/**
 	 * Load more page start
 	 */
 	const [pageStart, changePageStart] = useState(1);
 	const [loadMoreCount, changeLoadMoreCount] = useState(0);
-
 	const [firstLoad, changeFirstLoad] = useState(true);
 
 	/**
@@ -66,7 +65,15 @@ export default function Thread(props) {
 		sending: useState(false)
 	};
 
+	/**
+	 * message limit
+	 */
 	const pageLimit = 15;
+
+	/**
+	 * instantiate the Pusher
+	 */
+	const eventPusher = EventHandler();
 
 	/**
 	 * Ant Design props
@@ -74,8 +81,12 @@ export default function Thread(props) {
 	const { TextArea } = Input;
 	const Option = Select.Option;
 
+	/**
+	 * instantiate the Pusher
+	 */
 	useEffect(() => {
 		if (firstLoad) {
+			getNewMessage();
 			changeFirstLoad(false);
 		}
 	}, [firstLoad]);
@@ -93,43 +104,6 @@ export default function Thread(props) {
 		}
 		messageBody.contact_number_id.handleChange(props.contact_id);
 	}, [contactInfo, props.contact_id]);
-
-	/**
-	 * Get the dropdown html so i can set it to where it belongs
-	 */
-	useEffect(() => {
-		if (twilioNumberContainer != null) {
-			if (typeof twilioNumberContainer !== 'undefined') {
-				twilioNumberContainer.parentElement.parentElement.parentElement.className =
-					'lnx-twilio-number-container';
-			}
-		}
-	}, [twilioNumberContainer, contactInfo, props.contact_id]);
-
-	function handleChangeTwilioNumber() {
-		setTimeout(() => {
-			changetwilioNumberContainer(
-				document.getElementsByClassName('lnx-menu-overlay')[0]
-			);
-		}, 10);
-	}
-
-	useEffect(() => {
-		if (recipentContainer != null) {
-			if (typeof recipentContainer !== 'undefined') {
-				recipentContainer.parentElement.parentElement.className =
-					'lnx-recipient-container';
-			}
-		}
-	}, [recipentContainer]);
-
-	function handleChangeRecipientContainer() {
-		setTimeout(() => {
-			changeRecipientContainer(
-				document.getElementsByClassName('ant-select-dropdown')[0]
-			);
-		}, 10);
-	}
 
 	/**
 	 * View new message once the conversation is opened
@@ -193,10 +167,12 @@ export default function Thread(props) {
 			changeSearchLoading(true);
 			changeRecientOptions([]);
 			let {
-				data: {
-					data: { data }
-				}
-			} = await listContact(inputValue);
+				data: { data }
+			} = await listContact({
+				limit: 100,
+				offset: 0,
+				query: inputValue
+			});
 
 			if (data.length) {
 				let list = data.map(({ id, fullname }) => {
@@ -215,36 +191,34 @@ export default function Thread(props) {
 	 * Send's the message
 	 */
 	async function handleSendMessage() {
-		let {
-			conversation_id,
-			contact_number_id,
-			message: { value },
-			twilio_number_id
-		} = messageBody;
+		let messageContent = {};
 
-		let body = {
-			conversation_id: useValue(conversation_id),
-			contact_number_id: useValue(contact_number_id),
-			twilio_number_id: useValue(twilio_number_id),
-			message: value
-		};
+		Object.keys(messageBody).map(keys => {
+			messageContent[keys] = useValue(messageBody[keys]);
+		});
+
+		changeSendingMessage(true);
 
 		try {
-			if (body.contact_number_id.length > 1) {
-				await sendNewConversation(body);
+			if (typeof messageContent.contact_number_id == 'object') {
+				await sendNewConversation(messageContent);
+				component.renderComponent('Inbox');
 			} else {
 				let {
 					data: { data }
-				} = await sendConversation(body);
+				} = await sendConversation(messageContent);
 
 				messageBody.conversation_id.handleChange(data.conversation_id);
 				messageBody.message.handleChange(null);
 
+				changeSendingMessage(false);
 				changeThreadList([...threadList, data]);
 				changeLoadMoreCount(threadList.length);
 				viewNewMessage();
 			}
-		} catch (error) {}
+		} catch (error) {
+			changeSendingMessage(false);
+		}
 	}
 
 	/**
@@ -255,9 +229,29 @@ export default function Thread(props) {
 			let {
 				data: { data }
 			} = await listTwilioNumbers();
-
+			let twilioNumber = head(data);
+			messageBody.twilio_number_id.handleChange(twilioNumber.id);
 			changeTwilioNumbers(data);
 		} catch (error) {}
+	}
+
+	/**
+	 * check if new message has arrived
+	 */
+	function getNewMessage() {
+		eventPusher.newMessageRecieved(
+			({
+				data,
+				data: {
+					conversation: { contact_id }
+				}
+			}) => {
+				if (props.contact_id == contact_id) {
+					getList(contact_id);
+					updateNewMessage(contact_id);
+				}
+			}
+		);
 	}
 
 	/**
@@ -280,14 +274,18 @@ export default function Thread(props) {
 
 			let list = transformMessage(messages);
 
-			messageBody.twilio_number_id.handleChange(twilio_number_id);
-			messageBody.contact_number_id.handleChange(contact_id);
-			messageBody.conversation_id.handleChange(id);
+			let messageBodyInfo = { id, twilio_number_id, contact_id };
+
+			messageBody.conversation_id.handleChange(messageBodyInfo.id);
+			Object.keys(messageBody).map(keys => {
+				if (messageBody[keys] == messageBodyInfo[keys])
+					messageBody[keys].handleChange(messageBodyInfo[keys]);
+			});
+
 			changeThreadList(reverse(list));
 			changeContactInfo(contact);
 			changePageStart(++page);
 			changeLoadMoreCount(list.length);
-			// debounce(viewNewMessage, 50);
 		} catch (error) {
 			let info = {
 				fullname: props.title,
@@ -308,6 +306,9 @@ export default function Thread(props) {
 		} catch (error) {}
 	}
 
+	/**
+	 * load more message
+	 */
 	async function loadMoreMessages() {
 		try {
 			let page = pageStart;
@@ -328,6 +329,9 @@ export default function Thread(props) {
 		} catch (error) {}
 	}
 
+	/**
+	 * transform message given by the backend data
+	 */
 	function transformMessage(messages) {
 		return messages.map(({ message, direction, created_at, user, status }) => {
 			let sent_by = null;
@@ -349,25 +353,28 @@ export default function Thread(props) {
 	 * then view the lastest message of the thread
 	 */
 	function viewNewMessage() {
-		let thread = iframeDocument.getElementsByClassName('lnx-thread-body')[0];
+		let thread = iframeDocument.getElementsByClassName(styles.lnxThreadBody)[0];
 
 		thread.scrollTop = thread.scrollHeight;
 	}
 
 	return (
 		<Row className={'lnx-thread-container'}>
-			<Row className={'lnx-thread-header'}>
+			<Row className={styles.lnxThreadHeader}>
 				<Col span={checkInfo() ? 20 : 24}>
-					<div className="lnx-thread-header-recipient-info">
+					<div
+						id="lnx-thread-header-recipient-info"
+						className={'lnx-thread-header-recipient-info'}
+					>
 						{checkInfo() ? (
 							<Fragment>
 								<p
-									className={'lnx-thread-header-contact-name'}
+									className={styles.lnxThreadHeaderContactName}
 									onClick={viewNewMessage}
 								>
 									{contactInfo.fullname}
 								</p>
-								<p className={'lnx-thread-header-contact-number'}>
+								<p className={styles.lnxThreadHeaderContactNumber}>
 									{contactInfo.contact_number}
 								</p>
 							</Fragment>
@@ -380,8 +387,12 @@ export default function Thread(props) {
 								onChange={debounce(updateRecipientOptions, 50)}
 								onSearch={debounce(searchRecipient, 50)}
 								filterOption={false}
-								onDropdownVisibleChange={handleChangeRecipientContainer}
 								loading={searchLoading}
+								getPopupContainer={() =>
+									iframeDocument.getElementById(
+										'lnx-thread-header-recipient-info'
+									)
+								}
 							>
 								{recipientOptions}
 							</Select>
@@ -390,24 +401,24 @@ export default function Thread(props) {
 				</Col>
 				<Col
 					span={checkInfo() && threadList.length ? 4 : ''}
-					className={'lnx-thread-header-icon-container'}
+					className={styles.lnxThreadHeaderIconContainer}
 				>
 					{checkInfo() && threadList.length ? (
 						<Icon
 							onClick={deleteConversation}
 							type="delete"
-							className={'lnx-thread-header-delete-icon'}
+							className={styles.lnxThreadHeaderDeleteIcon}
 						/>
 					) : (
 						''
 					)}
 				</Col>
 			</Row>
-			<Row className={'lnx-thread-body'}>
+			<Row className={styles.lnxThreadBody}>
 				<Col>
 					{loadMoreCount == pageLimit ? (
 						<Button
-							className={'lnx-load-more-button'}
+							className={styles.lnxLoadMoreButton}
 							type="default"
 							onClick={loadMoreMessages}
 						>
@@ -420,28 +431,32 @@ export default function Thread(props) {
 						itemLayout="horizontal"
 						dataSource={threadList}
 						bordered
+						className={styles.antSpinContainer}
 						loading={loadMore}
 						renderItem={item => (
 							<Fragment>
 								<List.Item
-									className={`lnx-thread ${
+									className={cx(
+										styles.lnxThread,
 										item.direction == 'INBOUND'
-											? 'lnx-thread-inbound'
-											: 'lnx-thread-outbound'
-									}`}
+											? styles.lnxThreadInbound
+											: styles.lnxThreadOutbound
+									)}
 								>
-									<Card className={'lnx-thread-message-card'}>
-										<p className={'lnx-thread-message-content'}>
+									<Card className={styles.lnxThreadMessageCard}>
+										<p className={styles.lnxThreadMessageContent}>
 											{item.message}
 										</p>
-										<p className={'lnx-thread-message-time'}>
-											{item.status != 'failed'
+										<p className={styles.lnxThreadMessageTime}>
+											{item.status == 'delivered' ||
+											item.status != 'undelivered' ||
+											item.status == 'recieved'
 												? moment(item.created_at).fromNow()
 												: 'Failed'}
 										</p>
 										<br />
 										{item.direction == 'OUTBOUND' ? (
-											<p className={'lnx-thread-message-sender'}>
+											<p className={styles.lnxThreadMessageSender}>
 												Sent by {item.sent_by}
 											</p>
 										) : (
@@ -454,7 +469,7 @@ export default function Thread(props) {
 					/>
 				</Col>
 			</Row>
-			<Row className={'lnx-thread-textarea'}>
+			<Row className={styles.lnxThreadTextarea}>
 				<Col span={15}>
 					<TextArea
 						{...messageBody.message}
@@ -462,19 +477,29 @@ export default function Thread(props) {
 						rows={3}
 					/>
 				</Col>
-				<Col span={6} className={'lnx-thread-textarea-send-button-container'}>
+				<Col
+					span={6}
+					id="area"
+					className={styles.lnxThreadTextareaSendButtonContainer}
+				>
 					{!Object.keys(threadList).length ? (
 						<Dropdown.Button
 							type="primary"
 							onClick={handleSendMessage}
 							overlay={twilioNumbersOption}
 							trigger={['click']}
-							onVisibleChange={handleChangeTwilioNumber}
+							disabled={sendingMessage}
+							getPopupContainer={() => iframeDocument.getElementById('area')}
+							placement="topLeft"
 						>
 							Send
 						</Dropdown.Button>
 					) : (
-						<Button onClick={handleSendMessage} type="primary">
+						<Button
+							loading={sendingMessage}
+							onClick={handleSendMessage}
+							type="primary"
+						>
 							Send
 						</Button>
 					)}

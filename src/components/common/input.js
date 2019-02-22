@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Input, Form, Icon } from 'antd';
 import { useInput } from '../../states';
+import styles from './index.css';
 
 /*
  * props.name: name of the input component
@@ -13,17 +14,17 @@ function AppInput(props) {
 	const { getFieldDecorator } = props.form;
 	const data = useInput(null);
 
+	useEffect(() => {
+		handleValueChange();
+	}, [data]);
+
 	// send the update value to the parent
 	function handleValueChange() {
 		props.inputData(data.value);
 	}
 
-	useEffect(() => {
-		handleValueChange();
-	}, [data]);
-
 	return (
-		<Form.Item className={'lnx-form-group'}>
+		<Form.Item className={styles.lnxFormGroup}>
 			{getFieldDecorator(props.name, {
 				rules: [props.validationRules]
 			})(
