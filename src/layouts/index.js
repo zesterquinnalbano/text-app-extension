@@ -8,6 +8,9 @@ import SubHeader from './sub-header';
 
 export default function MainLayout({ iframeDocument, iframeWindow }) {
 	let state = {
+		iframeDocument,
+		iframeWindow,
+
 		/**
 		 * assign the component passed by the SubHeader
 		 * then renders the component
@@ -18,11 +21,11 @@ export default function MainLayout({ iframeDocument, iframeWindow }) {
 		 * handles the message search
 		 */
 		search: useInput(),
+
 		/**
-		 * get the iframe document body
+		 * count the new message from the inbox
 		 */
-		iframeDocument,
-		iframeWindow
+		newMessageCount: useInput(null)
 	};
 
 	return (

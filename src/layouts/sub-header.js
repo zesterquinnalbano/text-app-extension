@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
-import { Menu, Icon, Row } from 'antd';
+import React, { useContext, useEffect, useState } from 'react';
+import { Menu, Icon, Row, Badge } from 'antd';
 import styles from './index.css';
 import AppContext from '../context/app-context';
 import { getCurrentComponent } from '../services';
+import { useValue } from '../states';
 
 export default function SubHeader(props) {
 	/**
@@ -15,11 +16,23 @@ export default function SubHeader(props) {
 	 */
 	const latestComponent = getCurrentComponent();
 
+	const [countNewMessage, changeCountNewMessage] = useState(0);
+
 	/**
 	 * updates the global component
 	 */
 	function updateComponent(component) {
 		context.component.renderComponent(component);
+	}
+
+	useEffect(() => {
+		sumNewMessage();
+	}, [useValue(context.newMessageCount)]);
+
+	function sumNewMessage() {
+		let currentCount = countNewMessage;
+		currentCount += useValue(context.newMessageCount);
+		changeCountNewMessage(currentCount);
 	}
 
 	return (
@@ -30,8 +43,10 @@ export default function SubHeader(props) {
 					defaultSelectedKeys={[latestComponent.component]}
 				>
 					<Menu.Item key="Inbox" onClick={() => updateComponent('Inbox')}>
-						<Icon type="inbox" />
-						Inbox
+						<Badge count={countNewMessage}>
+							<Icon type="inbox" />
+							Inbox
+						</Badge>
 					</Menu.Item>
 					<Menu.Item key="Contacts" onClick={() => updateComponent('Contacts')}>
 						<Icon type="team" />

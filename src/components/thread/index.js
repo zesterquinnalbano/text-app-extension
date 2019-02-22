@@ -30,7 +30,12 @@ import { debounce, reverse, head } from 'lodash';
 import { useInput, useValue } from '../../states';
 
 export default function Thread(props) {
-	const { iframeWindow, iframeDocument, component } = useContext(AppContext);
+	const {
+		iframeWindow,
+		iframeDocument,
+		component,
+		newMessageCount
+	} = useContext(AppContext);
 
 	/**
 	 * Information variables
@@ -44,8 +49,8 @@ export default function Thread(props) {
 	 * Loading States
 	 */
 	const [searchLoading, changeSearchLoading] = useState(false);
-	const [loadMore, changeLoadMore] = useState(false);
 	const [sendingMessage, changeSendingMessage] = useState(false);
+	const [gettingList, changeGettingList] = useState(true);
 
 	/**
 	 * Load more page start
@@ -110,6 +115,9 @@ export default function Thread(props) {
 	 */
 	useEffect(() => {
 		viewNewMessage();
+		(async () => {
+			await updateNewMessage(props.contact_id);
+		})();
 	}, [contactInfo]);
 
 	/**
@@ -241,14 +249,12 @@ export default function Thread(props) {
 	function getNewMessage() {
 		eventPusher.newMessageRecieved(
 			({
-				data,
 				data: {
 					conversation: { contact_id }
 				}
 			}) => {
 				if (props.contact_id == contact_id) {
 					getList(contact_id);
-					updateNewMessage(contact_id);
 				}
 			}
 		);
@@ -262,6 +268,7 @@ export default function Thread(props) {
 	async function getList(contactId) {
 		try {
 			let page = pageStart;
+			changeGettingList(true);
 
 			const {
 				data: {
@@ -294,6 +301,8 @@ export default function Thread(props) {
 
 			changeContactInfo(info);
 		}
+
+		changeGettingList(false);
 	}
 
 	/**
@@ -312,6 +321,7 @@ export default function Thread(props) {
 	async function loadMoreMessages() {
 		try {
 			let page = pageStart;
+			changeGettingList(true);
 			const {
 				data: {
 					data: { messages }
@@ -327,25 +337,32 @@ export default function Thread(props) {
 			changePageStart(++page);
 			changeLoadMoreCount(list.length);
 		} catch (error) {}
+
+		changeGettingList(false);
 	}
 
 	/**
 	 * transform message given by the backend data
 	 */
 	function transformMessage(messages) {
-		return messages.map(({ message, direction, created_at, user, status }) => {
-			let sent_by = null;
-			if (user) {
-				sent_by = user.firstname;
+		return messages.map(
+			({ message, direction, created_at, user, status, new_message }) => {
+				let sent_by = null;
+				if (user) {
+					sent_by = user.firstname;
+				}
+				if (new_message == 1) {
+					newMessageCount.handleChange(-1);
+				}
+				return {
+					message,
+					direction,
+					created_at,
+					sent_by,
+					status
+				};
 			}
-			return {
-				message,
-				direction,
-				created_at,
-				sent_by,
-				status
-			};
-		});
+		);
 	}
 
 	/**
@@ -432,7 +449,7 @@ export default function Thread(props) {
 						dataSource={threadList}
 						bordered
 						className={styles.antSpinContainer}
-						loading={loadMore}
+						loading={gettingList}
 						renderItem={item => (
 							<Fragment>
 								<List.Item

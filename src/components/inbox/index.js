@@ -3,10 +3,7 @@ import cx from 'classnames';
 import moment from 'moment';
 import { Row, List, Col, Button, Input } from 'antd';
 import AppContext from '../../context/app-context';
-import {
-	listConversation,
-	updateNewMessage
-} from '../../resources/conversation';
+import { listConversation } from '../../resources/conversation';
 import EventHandler from '../../resources/event-handler';
 import { reverse } from 'lodash';
 import styles from './index.css';
@@ -18,12 +15,10 @@ export default function MessageContainer(props) {
 	const context = useContext(AppContext);
 
 	const [conversationList, changeConversationList] = useState([]);
-
 	const [firstLoad, changeFirstLoad] = useState(true);
-
+	const [gettingList, changeGettingList] = useState(true);
 	const [pageStart, changePageStart] = useState(1);
 	const [loadMoreCount, changeLoadMoreCount] = useState(0);
-
 	const [newMessage, hasNewMessage] = useState(false);
 
 	const pageLimit = 25;
@@ -35,7 +30,7 @@ export default function MessageContainer(props) {
 			getList();
 			changeFirstLoad(false);
 		}
-	}, [firstLoad, ...conversationList]);
+	}, [firstLoad]);
 
 	useEffect(() => {
 		if (firstLoad) {
@@ -47,7 +42,10 @@ export default function MessageContainer(props) {
 	}, [firstLoad]);
 
 	useEffect(() => {
-		getFreshList();
+		if (newMessage) {
+			getFreshList();
+			hasNewMessage(false);
+		}
 	}, [newMessage]);
 
 	function handleChangeSearchData(e) {
@@ -56,8 +54,6 @@ export default function MessageContainer(props) {
 
 	async function getFreshList() {
 		try {
-			let page = pageStart;
-
 			const {
 				data: { data }
 			} = await listConversation({
@@ -73,7 +69,7 @@ export default function MessageContainer(props) {
 
 	async function getList(searchData = null) {
 		try {
-			let page = pageStart;
+			changeGettingList(true);
 
 			const {
 				data: { data }
@@ -86,7 +82,9 @@ export default function MessageContainer(props) {
 			let list = transformMessage(data);
 
 			changeConversationList(reverse(list));
+			changeLoadMoreCount(conversationList.length);
 		} catch (error) {}
+		changeGettingList(false);
 	}
 
 	async function loadMoreMessages() {
@@ -105,6 +103,7 @@ export default function MessageContainer(props) {
 			if (list.length) {
 				changeConversationList([...conversationList, ...reverse(list)]);
 				changePageStart(page);
+				changeLoadMoreCount(conversationList.length);
 			}
 		} catch (error) {}
 	}
@@ -113,11 +112,7 @@ export default function MessageContainer(props) {
 		context.component.renderComponent('Thread');
 	}
 
-	function getThread({ contact_id, new_message }) {
-		if (new_message == 1) {
-			updateNewMessage(contact_id);
-		}
-
+	function getThread({ contact_id }) {
 		context.component.renderComponent('Thread', { contact_id });
 	}
 
@@ -127,6 +122,10 @@ export default function MessageContainer(props) {
 
 			if (messageString.length >= 30) {
 				messageString = messageString.concat('.....', '');
+			}
+
+			if (message.new_message == 1) {
+				context.newMessageCount.handleChange(1);
 			}
 
 			return {
@@ -158,6 +157,7 @@ export default function MessageContainer(props) {
 						itemLayout="horizontal"
 						dataSource={conversationList}
 						bordered
+						loading={gettingList}
 						renderItem={function(item) {
 							return (
 								<List.Item
@@ -173,13 +173,13 @@ export default function MessageContainer(props) {
 										title={item.title}
 										description={item.description}
 									/>
-									{moment(item.created_at).format('hh:mm a')}
+									{moment(item.created_at).fromNow()}
 								</List.Item>
 							);
 						}}
 					/>
 				</Col>
-				{pageLimit == conversationList.length ? (
+				{pageLimit == loadMoreCount ? (
 					<Col className={styles.lnxLoadMoreContainer}>
 						<Button onClick={loadMoreMessages} type="primary">
 							Load More

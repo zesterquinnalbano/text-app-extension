@@ -5,7 +5,7 @@ import AppContext from '../context/app-context';
  * Create axios config defaults
  */
 const instance = axios.create({
-	baseURL: 'http://localhost:8000'
+	baseURL: 'https://7d48008f.ngrok.io'
 });
 
 function get(url, query = null) {
@@ -13,7 +13,7 @@ function get(url, query = null) {
 	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = token;
+		headers.Authorization = JSON.stringify(token);
 	}
 
 	return instance({
@@ -23,17 +23,14 @@ function get(url, query = null) {
 		params: {
 			q: query
 		}
-	}).catch(function(error) {
-		logoutIfUnauthorized(error);
 	});
 }
-
-async function post(url, data = null) {
+function post(url, data = null) {
 	let headers = { 'Content-Type': 'application/json' };
 	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = token;
+		headers.Authorization = JSON.stringify(token);
 	}
 
 	return instance({
@@ -41,17 +38,15 @@ async function post(url, data = null) {
 		url,
 		headers,
 		data
-	}).catch(function(error) {
-		logoutIfUnauthorized(error);
 	});
 }
 
-async function patch(url, data = null) {
+function patch(url, data = null) {
 	let headers = { 'Content-Type': 'application/json' };
 	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = token;
+		headers.Authorization = JSON.stringify(token);
 	}
 
 	return instance({
@@ -59,8 +54,6 @@ async function patch(url, data = null) {
 		url,
 		headers,
 		data
-	}).catch(function(error) {
-		logoutIfUnauthorized(error);
 	});
 }
 

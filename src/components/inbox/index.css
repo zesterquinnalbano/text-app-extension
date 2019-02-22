@@ -3,9 +3,9 @@
   height: calc(100vh - 175px) !important
 }
 
-/* .lnxInboxMessageContainer .ant-badge-not-a-wrapper {
-  margin-right: 10px;
-} */
+.lnxInboxMessageContainer div>div {
+  border-radius: 0px
+}
 
 .lnxSearchBar {
   padding: 15px;
@@ -23,7 +23,7 @@
 }
 
 .lnxListContainerContent.lnxNewMessage {
-  border-left: 6px solid #31c558;
+  border-left: 6px solid #f5222d;
 }
 
 .lnxListContainerContent div div h4 {

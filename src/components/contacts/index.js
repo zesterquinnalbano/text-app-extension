@@ -16,6 +16,7 @@ export default function ContactListContainer() {
 	 */
 	const [contactList, changeContactList] = useState([]);
 
+	const [gettingList, changeGettingList] = useState(true);
 	const [pageStart, changePageStart] = useState(1);
 
 	const [firstLoad, changeFirstLoad] = useState(true);
@@ -30,6 +31,7 @@ export default function ContactListContainer() {
 
 	async function getList(searchData = null) {
 		try {
+			changeGettingList(true);
 			const {
 				data: { data }
 			} = await listContact({
@@ -42,6 +44,7 @@ export default function ContactListContainer() {
 
 			changeContactList(list);
 		} catch (error) {}
+		changeGettingList(false);
 	}
 
 	async function loadMoreMessages() {
@@ -96,6 +99,7 @@ export default function ContactListContainer() {
 						itemLayout="horizontal"
 						dataSource={contactList}
 						bordered
+						loading={gettingList}
 						renderItem={function(item) {
 							return (
 								<List.Item

@@ -7,6 +7,10 @@
   font-size: 2rem
 }
 
+.lnxContactsContainer div>div {
+  border-radius: 0px
+}
+
 .lnxSearchBar {
   padding: 15px;
   box-shadow: 1px 5px 8px #d4d4d4;
