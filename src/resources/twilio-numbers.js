@@ -7,7 +7,6 @@ function listTwilioNumbers() {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});

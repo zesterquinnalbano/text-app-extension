@@ -26,7 +26,7 @@ import {
 import EventHandler from '../../resources/event-handler';
 import { listTwilioNumbers } from '../../resources/twilio-numbers';
 import { listContact } from '../../resources/contact';
-import { debounce, reverse, head } from 'lodash';
+import { debounce, reverse, head, find } from 'lodash';
 import { useInput, useValue } from '../../states';
 
 export default function Thread(props) {
@@ -91,7 +91,8 @@ export default function Thread(props) {
 	 */
 	useEffect(() => {
 		if (firstLoad) {
-			getNewMessage();
+			getNewMessageEvent();
+			updateMessageStatusEvent();
 			changeFirstLoad(false);
 		}
 	}, [firstLoad]);
@@ -116,7 +117,9 @@ export default function Thread(props) {
 	useEffect(() => {
 		viewNewMessage();
 		(async () => {
-			await updateNewMessage(props.contact_id);
+			try {
+				await updateNewMessage(props.contact_id);
+			} catch (error) {}
 		})();
 	}, [contactInfo]);
 
@@ -191,8 +194,10 @@ export default function Thread(props) {
 			} else {
 				changeRecientOptions([]);
 			}
+		} catch (error) {
+		} finally {
 			changeSearchLoading(false);
-		} catch (error) {}
+		}
 	}
 
 	/**
@@ -219,12 +224,12 @@ export default function Thread(props) {
 				messageBody.conversation_id.handleChange(data.conversation_id);
 				messageBody.message.handleChange(null);
 
-				changeSendingMessage(false);
 				changeThreadList([...threadList, data]);
 				changeLoadMoreCount(threadList.length);
 				viewNewMessage();
 			}
 		} catch (error) {
+		} finally {
 			changeSendingMessage(false);
 		}
 	}
@@ -246,7 +251,7 @@ export default function Thread(props) {
 	/**
 	 * check if new message has arrived
 	 */
-	function getNewMessage() {
+	function getNewMessageEvent() {
 		eventPusher.newMessageRecieved(
 			({
 				data: {
@@ -255,6 +260,28 @@ export default function Thread(props) {
 			}) => {
 				if (props.contact_id == contact_id) {
 					getList(contact_id);
+				}
+			}
+		);
+	}
+
+	/**
+	 * updates the message status
+	 */
+	function updateMessageStatusEvent() {
+		eventPusher.updatewMessageStatus(
+			({
+				data: {
+					status,
+					id,
+					conversation: { contact_id }
+				}
+			}) => {
+				if (props.contact_id == contact_id) {
+					let message = find(threadList, ['id', id]);
+					if (typeof message != 'undefined') {
+						Object.assign(message, { status });
+					}
 				}
 			}
 		);
@@ -300,9 +327,9 @@ export default function Thread(props) {
 			};
 
 			changeContactInfo(info);
+		} finally {
+			changeGettingList(false);
 		}
-
-		changeGettingList(false);
 	}
 
 	/**
@@ -336,9 +363,10 @@ export default function Thread(props) {
 			changeThreadList([...reverse(list), ...threadList]);
 			changePageStart(++page);
 			changeLoadMoreCount(list.length);
-		} catch (error) {}
-
-		changeGettingList(false);
+		} catch (error) {
+		} finally {
+			changeGettingList(false);
+		}
 	}
 
 	/**
@@ -346,7 +374,7 @@ export default function Thread(props) {
 	 */
 	function transformMessage(messages) {
 		return messages.map(
-			({ message, direction, created_at, user, status, new_message }) => {
+			({ id, message, direction, created_at, user, status, new_message }) => {
 				let sent_by = null;
 				if (user) {
 					sent_by = user.firstname;
@@ -355,6 +383,7 @@ export default function Thread(props) {
 					newMessageCount.handleChange(-1);
 				}
 				return {
+					id,
 					message,
 					direction,
 					created_at,
@@ -363,6 +392,25 @@ export default function Thread(props) {
 				};
 			}
 		);
+	}
+
+	function messageStatus({ status, created_at }) {
+		switch (status) {
+			case 'sent':
+				return moment(created_at).fromNow();
+				break;
+			case 'undelivered':
+				return 'Failed';
+				break;
+			case 'failed':
+				return 'Failed';
+				break;
+			case 'received':
+				return moment(created_at).fromNow();
+			default:
+				return 'Sending';
+				break;
+		}
 	}
 
 	/**
@@ -453,6 +501,7 @@ export default function Thread(props) {
 						renderItem={item => (
 							<Fragment>
 								<List.Item
+									key={item.id}
 									className={cx(
 										styles.lnxThread,
 										item.direction == 'INBOUND'
@@ -465,11 +514,7 @@ export default function Thread(props) {
 											{item.message}
 										</p>
 										<p className={styles.lnxThreadMessageTime}>
-											{item.status == 'delivered' ||
-											item.status != 'undelivered' ||
-											item.status == 'recieved'
-												? moment(item.created_at).fromNow()
-												: 'Failed'}
+											{messageStatus(item)}
 										</p>
 										<br />
 										{item.direction == 'OUTBOUND' ? (

@@ -36,14 +36,14 @@ function Content() {
 /**
  * refresh authorization when page is refreshed
  */
-(async () => {
-	if (
-		performance.navigation.type == 1 &&
-		localStorage.getItem('text_app_token')
-	) {
-		await refreshToken();
-	}
-})();
+// (async () => {
+// 	if (
+// 		performance.navigation.type == 1 &&
+// 		localStorage.getItem('text_app_token')
+// 	) {
+// 		await refreshToken();
+// 	}
+// })();
 
 /**
  * append the element that will be used in the extension

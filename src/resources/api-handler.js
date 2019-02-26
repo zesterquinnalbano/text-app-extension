@@ -8,12 +8,27 @@ const instance = axios.create({
 	baseURL: 'https://7d48008f.ngrok.io'
 });
 
+// Add a response interceptor
+instance.interceptors.response.use(
+	function(response) {
+		// Do something with response data
+		return response;
+	},
+	function(error) {
+		if (error.response.status == 401) {
+			localStorage.removeItem('text_app_token');
+			AppContext.component.changeIsLoggedIn(false);
+			AppContext.component.renderComponent('Login');
+		}
+	}
+);
+
 function get(url, query = null) {
 	let headers = { 'Content-Type': 'application/json' };
 	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = JSON.stringify(token);
+		headers.Authorization = JSON.parse(token);
 	}
 
 	return instance({
@@ -25,12 +40,13 @@ function get(url, query = null) {
 		}
 	});
 }
+
 function post(url, data = null) {
 	let headers = { 'Content-Type': 'application/json' };
 	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = JSON.stringify(token);
+		headers.Authorization = JSON.parse(token);
 	}
 
 	return instance({
@@ -46,7 +62,7 @@ function patch(url, data = null) {
 	let token = localStorage.getItem('text_app_token');
 
 	if (token) {
-		headers.Authorization = JSON.stringify(token);
+		headers.Authorization = JSON.parse(token);
 	}
 
 	return instance({

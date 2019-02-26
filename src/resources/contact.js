@@ -7,7 +7,6 @@ function listContact(query = null) {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
@@ -20,7 +19,6 @@ function storeContact(data) {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
@@ -33,7 +31,6 @@ function editContact(id) {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
@@ -46,7 +43,6 @@ function updateContact(id, data) {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
@@ -59,7 +55,6 @@ function destroyContact(id) {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});

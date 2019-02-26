@@ -70,11 +70,12 @@ export default function Settings(props) {
 	}
 
 	async function logout() {
-		await logout();
-		localStorage.removeItem('text_app_token');
-		localStorage.removeItem('text_app_current_component');
-		context.component.handleLoggedIn(false);
-		context.component.renderComponent('Login');
+		try {
+			await logout();
+			localStorage.removeItem('text_app_token');
+			context.component.handleLoggedIn(false);
+			context.component.renderComponent('Login');
+		} catch (error) {}
 	}
 
 	return (

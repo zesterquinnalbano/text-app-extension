@@ -12,7 +12,6 @@ function updateUser(params) {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
@@ -25,7 +24,6 @@ function getUser() {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
@@ -38,7 +36,6 @@ function logout() {
 				resolve(response);
 			})
 			.catch(error => {
-				logoutIfUnauthorized(error);
 				reject(error);
 			});
 	});
